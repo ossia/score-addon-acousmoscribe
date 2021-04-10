@@ -17,7 +17,7 @@ set(HDRS
     Acousmoscribe/View/SpectralKeyView.hpp
     Acousmoscribe/View/MelodicKeyView.hpp
     Acousmoscribe/View/SignView.hpp
-    
+
     #Commands
     Acousmoscribe/Commands/CommandFactory.hpp
     Acousmoscribe/Commands/AddKey.hpp
@@ -41,17 +41,26 @@ set(HDRS
     score_addon_acousmoscribe.hpp
 )
 set(SRCS
+    #Model
+    #Acousmoscribe/Model/DynamicProfile.cpp
+    Acousmoscribe/Model/MelodicProfile.cpp
+    Acousmoscribe/Model/MelodicKey.cpp
+    Acousmoscribe/Model/RhythmicProfile.cpp
+    Acousmoscribe/Model/SpectralKey.cpp
+    Acousmoscribe/Model/Sign.cpp
+
+    #Score process
     Acousmoscribe/Executor.cpp
     Acousmoscribe/Inspector/Inspector.cpp
     Acousmoscribe/LocalTree.cpp
     Acousmoscribe/Presenter/Presenter.cpp
-    
+
     #View
     Acousmoscribe/View/View.cpp
     Acousmoscribe/View/SpectralKeyView.cpp
     Acousmoscribe/View/MelodicKeyView.cpp
     Acousmoscribe/View/SignView.cpp
-    
+
     #Commands
     Acousmoscribe/Commands/AddKey.cpp
     Acousmoscribe/Commands/ChangeMelodicKey.cpp
@@ -69,7 +78,7 @@ set(SRCS
     Acousmoscribe/Model/RhythmicProfile.cpp
     Acousmoscribe/Model/SpectralKey.cpp
     Acousmoscribe/Model/Sign.cpp
-    
+
     score_addon_acousmoscribe.cpp
 )
 
@@ -79,7 +88,7 @@ find_package(Catch2 REQUIRED)
 
 # Creation of the library
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
-add_subdirectory(${OSSIA_3RDPARTY_FOLDER}/Catch2 catch2)
+#add_subdirectory(${OSSIA_3RDPARTY_FOLDER}/Catch2 catch2)
 add_executable(testModel Acousmoscribe/testModel/testModel.cpp)
 
 # Code generation
@@ -94,6 +103,6 @@ target_link_libraries(testModel PRIVATE score_addon_acousmoscribe Catch2::Catch2
 add_test(NAME testModel COMMAND testModel)
 
 include(CTest)
-include(Catch)
+# include(Catch)
 # Target-specific options
 setup_score_plugin(${PROJECT_NAME})
