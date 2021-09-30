@@ -28,7 +28,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<MelodicKey>, MelodicKeyData> m_before, m_after;
+  std::pair<Id<MelodicKey>, MelodicKeyData> m_before, m_after;
 };
 
 
@@ -49,6 +49,6 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<MelodicKey>, MelodicKeyData> m_before, m_after;
+  std::pair<Id<MelodicKey>, MelodicKeyData> m_before, m_after;
 };
 }

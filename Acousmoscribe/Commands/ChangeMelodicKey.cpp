@@ -5,7 +5,6 @@
 
 #include <score/model/path/PathSerialization.hpp>
 #include <score/tools/IdentifierGeneration.hpp>
-
 namespace Acousmoscribe
 {
 ChangeMelodicKeyPitch::ChangeMelodicKeyPitch(
@@ -16,9 +15,9 @@ ChangeMelodicKeyPitch::ChangeMelodicKeyPitch(
 {
   auto& mKey = model.melodicKeys.at(to_change);
   MelodicKeyData data = mKey.melodicKeyData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setPitch(pitch);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicKeyPitch::update(unused_t, unused_t, Pitch pitch)
@@ -61,9 +60,9 @@ ChangeMelodicKeyRange::ChangeMelodicKeyRange(
 {
   auto& mKey = model.melodicKeys.at(to_change);
   MelodicKeyData data = mKey.melodicKeyData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setRange(range);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicKeyRange::update(unused_t, unused_t, Range range)

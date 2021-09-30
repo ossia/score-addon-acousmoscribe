@@ -7,7 +7,6 @@ score_common_setup()
 set(HDRS
     Acousmoscribe/Executor.hpp
     Acousmoscribe/Inspector/Inspector.hpp
-    Acousmoscribe/LocalTree.hpp
     Acousmoscribe/Metadata.hpp
     Acousmoscribe/Presenter/Presenter.hpp
     Acousmoscribe/Layer.hpp
@@ -52,7 +51,6 @@ set(SRCS
     #Score process
     Acousmoscribe/Executor.cpp
     Acousmoscribe/Inspector/Inspector.cpp
-    Acousmoscribe/LocalTree.cpp
     Acousmoscribe/Presenter/Presenter.cpp
 
     #View

@@ -21,9 +21,9 @@ MoveSigns::MoveSigns(
   {
     auto& sign = model.signs.at(sign_id);
     SignData data = sign.signData();
-    m_before.push_back(qMakePair(sign.id(), data));
+    m_before.push_back(std::make_pair(sign.id(), data));
     data.m_start = std::max(data.m_start + t_delta, 0.);
-    m_after.push_back(qMakePair(sign.id(), data));
+    m_after.push_back(std::make_pair(sign.id(), data));
   }
 }
 

@@ -27,10 +27,7 @@ score_addon_acousmoscribe::factories(
       FW<Process::ProcessModelFactory, Acousmoscribe::ProcessFactory>,
       FW<Process::LayerFactory, Acousmoscribe::LayerFactory>,
       FW<Process::InspectorWidgetDelegateFactory, Acousmoscribe::InspectorFactory>,
-      FW<Execution::ProcessComponentFactory,
-         Acousmoscribe::ProcessExecutorComponentFactory>,
-      FW<LocalTree::ProcessComponentFactory,
-         Acousmoscribe::LocalTreeProcessComponentFactory>>(ctx, key);
+      FW<Execution::ProcessComponentFactory, Acousmoscribe::ProcessExecutorComponentFactory>>(ctx, key);
 }
 
 std::pair<const CommandGroupKey, CommandGeneratorMap>

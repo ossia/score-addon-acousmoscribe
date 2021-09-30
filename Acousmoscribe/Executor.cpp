@@ -28,9 +28,8 @@ private:
 };
 
 ProcessExecutorComponent::ProcessExecutorComponent(
-    Acousmoscribe::Model& element, const Execution::Context& ctx,
-    const Id<score::Component>& id, QObject* parent)
-    : ProcessComponent_T{element, ctx, id, "AcousmoscribeExecutorComponent", parent}
+    Acousmoscribe::Model& element, const Execution::Context& ctx, QObject* parent)
+    : ProcessComponent_T{element, ctx, "AcousmoscribeExecutorComponent", parent}
 {
   auto n = std::make_shared<Acousmoscribe::node>();
   this->node = n;

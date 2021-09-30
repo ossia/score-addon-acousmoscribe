@@ -31,6 +31,6 @@ protected:
 
 private:
   Path<Model> m_model;
-  QVector<QPair<Id<Sign>, SignData>> m_before, m_after;
+  std::vector<std::pair<Id<Sign>, SignData>> m_before, m_after;
 };
 }
