@@ -42,7 +42,7 @@ public:
     MelodicKey(const Id<MelodicKey>& id, MelodicKeyData n, QObject* parent);
 
     template <typename Impl>
-    MelodicKey(Impl& vis, QObject* parent) : IdentifiedObject{vis, parent}
+    MelodicKey(Impl&& vis, QObject* parent) : IdentifiedObject{vis, parent}
     {
       vis.writeTo(*this);
     }

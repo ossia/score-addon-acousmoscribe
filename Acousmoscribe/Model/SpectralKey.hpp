@@ -51,7 +51,7 @@ enum Nature
     bool m_isHybrid2{false};
     bool m_isRich{false};
     bool m_isRich2{false};
-}; 
+};
 
 class SpectralKey final : public IdentifiedObject<SpectralKey>{
 
@@ -71,14 +71,14 @@ public:
     } */
 
     template <typename Impl>
-    SpectralKey(Impl& vis, QObject* parent) : IdentifiedObject{vis, parent}
+    SpectralKey(Impl&& vis, QObject* parent) : IdentifiedObject{vis, parent}
     {
       vis.writeTo(*this);
     }
 
-    //~SpectralKey(); 
+    //~SpectralKey();
 
-    Nature nature() const noexcept;  
+    Nature nature() const noexcept;
     Nature nature2() const noexcept;
     bool isHybrid() const noexcept;
     bool isHybrid2() const noexcept;

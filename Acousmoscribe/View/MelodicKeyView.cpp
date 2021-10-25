@@ -23,8 +23,8 @@ MelodicKeyView::MelodicKeyView(const MelodicKey& mk, Presenter& p, View* parent)
 }
 
 void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-
 {
+  painter->setRenderHint(QPainter::Antialiasing, true);
   float w = m_width;
   float h = m_height*0.99;
 
@@ -32,7 +32,7 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
   Range range = melodicKey.range();
 
   QPen pen;
-  pen.setWidth(1);
+  pen.setWidth(2);
   pen.setColor(Qt::black);
   pen.setStyle(Qt::SolidLine);
   painter->setPen(pen);
@@ -53,7 +53,7 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
       pen.setWidth(3); // the 4th point is bigger
       painter->setPen(pen);
       painter->drawPoint(QPoint(x_pitch, y_pitch));
-      pen.setWidth(1);
+      pen.setWidth(2);
       painter->setPen(pen);
     }
     else{
@@ -64,19 +64,19 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
   switch(range)
   {
     case weak:
-      pen.setStyle(Qt::DotLine); 
+      pen.setStyle(Qt::DotLine);
       break;
 
     case normal:
-      pen.setStyle(Qt::DashDotLine); 
+      pen.setStyle(Qt::DashDotLine);
       break;
 
     case strong:
-      pen.setStyle(Qt::SolidLine); 
+      pen.setStyle(Qt::SolidLine);
       break;
 
     default:
-      pen.setStyle(Qt::SolidLine); 
+      pen.setStyle(Qt::SolidLine);
       break;
   }
 
@@ -84,7 +84,8 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
   float y_range = (pitch+1)*h_pitch/7;;
   painter->drawLine(QPoint(x_pitch, y_range), QPoint(x_pitch + w/2, y_range));
-  
+
+  painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
 QRectF MelodicKeyView::computeRect() const noexcept
@@ -93,7 +94,7 @@ QRectF MelodicKeyView::computeRect() const noexcept
   const auto h = view.height();
   const auto w = view.defaultWidth();
   const QRectF rect{
-      0.1*w, 
+      0.1*w,
       0,
       0.1*w,
       h};

@@ -26,13 +26,15 @@ class MelodicKeyView;
 class SpectralKey;
 class SpectralKeyView;
 
-class Presenter final : public Process::LayerPresenter
+class Presenter final
+    : public Process::LayerPresenter
+    , public Nano::Observer
 {
 public:
   explicit Presenter(
-      const Model& model, 
+      const Model& model,
       View* view,
-      const Process::Context& ctx, 
+      const Process::Context& ctx,
       QObject* parent);
   ~Presenter() override;
 
@@ -51,13 +53,13 @@ public:
 
 
   //void on_melodicKeyChanged(MelodicKeyView& mKey);
-  
+
   void on_melodicKeyPitchChanged(const MelodicKey&, Pitch pitch);
   void on_melodicKeyRangeChanged(const MelodicKey&, Range range);
 
 
   //void on_spectralKeyChanged(SpectralKeyView& sKey);
-  
+
   void on_spectralKeyNatureChanged(const SpectralKey&, Nature nature);
   void on_spectralKeyNature2Changed(const SpectralKey&, Nature nature);
   void on_spectralKeyIsHybridChanged(const SpectralKey&, bool isHybrid);
@@ -66,9 +68,9 @@ public:
   void on_spectralKeyIsRich2Changed(const SpectralKey&, bool isRich);
   void on_spectralKeyIsWarpedChanged(const SpectralKey&, bool warped);
   void on_spectralKeyIsWarped2Changed(const SpectralKey&, bool warped);
-  
 
-  
+
+
   void on_deselectOtherSigns();                         //done
   void on_signDuplicate();
   void on_signScaled(const Sign&, double newScale);     //done
@@ -94,7 +96,7 @@ public:
   void on_signGrainChanged(const Sign&, Grain g);                                     //done
 
 
-private:  
+private:
 
   void updateSpectralKey(SpectralKeyView&);
   void on_spectralKeyAdded(const SpectralKey&);
@@ -107,13 +109,13 @@ private:
   void updateSign(SignView&);         //done
   void on_signAdded(const Sign&);     //done
   void on_signRemoving(const Sign&);  //done
-  
+
   std::vector<Id<Sign>> selectedSigns() const;            //done
 
   const Model& m_model;
   View* m_view{};
-  MelodicKeyView* m_melodicKeyView;
-  SpectralKeyView* m_spectralKeyView;
+  MelodicKeyView* m_melodicKeyView{};
+  SpectralKeyView* m_spectralKeyView{};
   std::vector<SignView*> m_signs;
 
   /* COMMAND DISPATCHERS */

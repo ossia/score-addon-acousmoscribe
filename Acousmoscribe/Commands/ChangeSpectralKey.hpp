@@ -28,7 +28,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -49,7 +49,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -70,7 +70,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -91,7 +91,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -112,7 +112,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -134,7 +134,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -155,7 +155,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 
@@ -176,7 +176,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
+  std::pair<Id<SpectralKey>, SpectralKeyData> m_before, m_after;
 };
 
 

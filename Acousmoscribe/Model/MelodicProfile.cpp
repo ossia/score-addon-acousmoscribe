@@ -54,7 +54,7 @@ void DataStreamWriter::write(Acousmoscribe::MelodicProfile& mp)
     Acousmoscribe::Variation v;
 
     m_stream >> p >> v;
-    
+
     mp.setPitch(p);
     mp.setPitchEnd(pe);
     mp.setVariation(v);
@@ -89,7 +89,7 @@ void JSONWriter::write(Acousmoscribe::MelodicProfile& mp)
   mp.setPitch(p);
 
   Acousmoscribe::Pitch pe;
-  switch (arr[0].GetInt())
+  switch (arr[1].GetInt())
   {
   case 0: pe = Acousmoscribe::very_high; break;
   case 1: pe = Acousmoscribe::high; break;
@@ -103,7 +103,7 @@ void JSONWriter::write(Acousmoscribe::MelodicProfile& mp)
   mp.setPitchEnd(p);
 
   Acousmoscribe::Variation var;
-  switch (arr[1].GetInt())
+  switch (arr[2].GetInt())
   {
   case 1: var = Acousmoscribe::random_variation; break;
   default: var = Acousmoscribe::none;

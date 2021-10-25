@@ -6,7 +6,6 @@
 #include <Acousmoscribe/Executor.hpp>
 #include <Acousmoscribe/Inspector/Inspector.hpp>
 #include <Acousmoscribe/Layer.hpp>
-#include <Acousmoscribe/LocalTree.hpp>
 #include <Acousmoscribe/Model/Process.hpp>
 #include <score_addon_acousmoscribe_commands_files.hpp>
 

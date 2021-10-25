@@ -19,9 +19,9 @@ ChangeDynamicProfile::ChangeDynamicProfile(
 {
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setDynamicProfile(dyn);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeDynamicProfile::update(unused_t, unused_t, DynamicProfile dyn)
@@ -66,9 +66,9 @@ ChangeMelodicProfile::ChangeMelodicProfile(
 {
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setMelodicProfile(melo);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicProfile::update(unused_t, unused_t, MelodicProfile melo)
@@ -113,9 +113,9 @@ ChangeRhythmicProfile::ChangeRhythmicProfile(
 {
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setRhythmicProfile(rhythm);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeRhythmicProfile::update(unused_t, unused_t, RhythmicProfile rhythm)
@@ -160,9 +160,9 @@ ChangeGrain::ChangeGrain(
 {
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
-  m_before = qMakePair(mKey.id(), data);
+  m_before = std::make_pair(mKey.id(), data);
   data.setGrain(grain);
-  m_after = qMakePair(mKey.id(), data);
+  m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeGrain::update(unused_t, unused_t, Grain grain)

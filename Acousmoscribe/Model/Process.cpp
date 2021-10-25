@@ -1,5 +1,8 @@
 #include "Process.hpp"
 
+#include <Acousmoscribe/Commands/AddKey.hpp>
+#include <Acousmoscribe/Model/MelodicKey.hpp>
+#include <Acousmoscribe/Model/SpectralKey.hpp>
 #include <score/plugins/SerializableHelpers.hpp>
 #include <score/model/EntitySerialization.hpp>
 #include <score/model/EntityMapSerialization.hpp>
@@ -21,6 +24,19 @@ Model::Model(
     : Process::ProcessModel{duration, id, "AcousmoscribeProcess", parent}
 {
   metadata().setInstanceName(*this);
+
+
+  // Default MelodicKey
+  MelodicKeyData mkData = {mid, weak};
+
+  melodicKeys.add(new MelodicKey{Id<MelodicKey>{0}, mkData , this});
+
+  // Default SpectralKey
+  SpectralKeyData skData;
+  skData.setNature(tonic);
+  skData.setNature2(null);
+
+  spectralKey.add(new SpectralKey{Id<SpectralKey>{0}, skData , this});
 }
 
 Model::~Model()
@@ -32,13 +48,13 @@ QString Model::prettyName() const noexcept
   return tr("Acousmoscribe Process");
 }
 
-void Model::setDurationAndScale(const TimeVal& newDuration) noexcept 
+void Model::setDurationAndScale(const TimeVal& newDuration) noexcept
 {
   signsChanged();
   setDuration(newDuration);
 }
 
-void Model::setDurationAndGrow(const TimeVal& newDuration) noexcept 
+void Model::setDurationAndGrow(const TimeVal& newDuration) noexcept
 {
   if(duration() == newDuration)
     return;
@@ -53,7 +69,7 @@ void Model::setDurationAndGrow(const TimeVal& newDuration) noexcept
   setDuration(newDuration);
 }
 
-void Model::setDurationAndShrink(const TimeVal& newDuration) noexcept 
+void Model::setDurationAndShrink(const TimeVal& newDuration) noexcept
 {
    if(duration() == newDuration)
     return;
@@ -96,7 +112,7 @@ void DataStreamReader::read(const Acousmoscribe::SignData& sd)
 {
   m_stream << sd.m_start << sd.m_duration << sd.m_grain << sd.m_dynamicProfile << sd.m_melodicProfile << sd.m_rhythmicProfile;
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SignData& sd)
@@ -104,7 +120,7 @@ void DataStreamWriter::write(Acousmoscribe::SignData& sd)
   m_stream >> sd.m_start >> sd.m_duration >> sd.m_grain >> sd.m_dynamicProfile >> sd.m_melodicProfile >> sd.m_rhythmicProfile;
   checkDelimiter();
 }
- 
+
 template <>
 void JSONReader::read(const Acousmoscribe::SignData& sd)
 {
@@ -116,7 +132,7 @@ void JSONReader::read(const Acousmoscribe::SignData& sd)
   JSONReader::read(sd.m_melodicProfile);
   JSONReader::read(sd.m_rhythmicProfile);
   stream.EndArray();
-} 
+}
 
 template <>
 void JSONWriter::write(Acousmoscribe::SignData& sd)
@@ -125,7 +141,7 @@ void JSONWriter::write(Acousmoscribe::SignData& sd)
   sd.m_start = arr[0].GetDouble();
   sd.m_duration = arr[1].GetDouble();
   sd.m_grain = (Acousmoscribe::Grain) arr[2].GetInt();
-  JSONWriter::write(sd.m_dynamicProfile); 
+  JSONWriter::write(sd.m_dynamicProfile);
   JSONWriter::write(sd.m_melodicProfile);
   JSONWriter::write(sd.m_rhythmicProfile);
 }
@@ -148,7 +164,7 @@ void DataStreamWriter::write(Acousmoscribe::Sign& s)
   s.setData(d);
   checkDelimiter();
 }
- 
+
 template <>
 void JSONReader::read(const Acousmoscribe::Sign& s)
 {
@@ -161,7 +177,7 @@ void JSONReader::read(const Acousmoscribe::Sign& s)
   JSONReader::read(s._melodicProfile);
   JSONReader::read(s._rhythmicProfile);
   stream.EndArray();
-} 
+}
 
 
 
@@ -173,9 +189,9 @@ void JSONWriter::write(Acousmoscribe::Sign& s)
   s.m_start = arr[0].GetDouble();
   s.m_duration = arr[1].GetDouble();
   s._grain = (Acousmoscribe::Grain) arr[2].GetInt();
-  JSONWriter::write(s._dynamicProfile); 
-  JSONWriter::write(s._melodicProfile);
-  JSONWriter::write(s._rhythmicProfile);
+  JSONWriter{JsonValue{arr[3]}}.write(s._dynamicProfile);
+  JSONWriter{JsonValue{arr[4]}}.write(s._melodicProfile);
+  JSONWriter{JsonValue{arr[5]}}.write(s._rhythmicProfile);
 }
 
 
@@ -191,7 +207,7 @@ void DataStreamReader::read(const Acousmoscribe::Model& proc)
   for (const auto& sign : proc.signs)
   {
     readFrom(sign);
-  } 
+  }
 
   m_stream << (int32_t)proc.spectralKey.size();
 
@@ -218,13 +234,13 @@ void DataStreamWriter::write(Acousmoscribe::Model& proc)
 
   for(; sign_count-- > 0;)
     proc.signs.add(new Acousmoscribe::Sign{*this, &proc});
-  
+
   int32_t speck_count;
   m_stream >> speck_count;
 
   for(; speck_count-- >0;)
     proc.spectralKey.add(new Acousmoscribe::SpectralKey{*this, &proc});
-  
+
   int32_t melok_count;
   m_stream >> melok_count;
 
@@ -238,11 +254,21 @@ template <>
 void JSONReader::read(const Acousmoscribe::Model& proc)
 {
   obj["Signs"] = proc.signs;
+  obj["MelodicKeys"] = proc.melodicKeys;
+  obj["SpectralKeys"] = proc.spectralKey;
 }
 
 template <>
 void JSONWriter::write(Acousmoscribe::Model& proc)
 {
+  for(const auto& json_vref : obj["MelodicKeys"].toArray()){
+    JSONObject::Deserializer deserializer{json_vref};
+    proc.melodicKeys.add(new Acousmoscribe::MelodicKey{deserializer, &proc});
+  }
+  for(const auto& json_vref : obj["SpectralKeys"].toArray()){
+    JSONObject::Deserializer deserializer{json_vref};
+    proc.spectralKey.add(new Acousmoscribe::SpectralKey{deserializer, &proc});
+  }
   for(const auto& json_vref : obj["Signs"].toArray()){
     JSONObject::Deserializer deserializer{json_vref};
     proc.signs.add(new Acousmoscribe::Sign{deserializer, &proc});
@@ -258,7 +284,7 @@ void DataStreamReader::read(const Acousmoscribe::SpectralKeyData& skd)
 {
   m_stream << skd.nature() << skd.nature2() << skd.isHybrid() << skd.isHybrid2() << skd.isRich() << skd.isRich2() << skd.isWarped() << skd.isWarped2();
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SpectralKeyData& skd)
@@ -276,7 +302,7 @@ void DataStreamWriter::write(Acousmoscribe::SpectralKeyData& skd)
     skd.setIsWarped(warp);
     skd.setIsWarped2(warp2);
     checkDelimiter();
-} 
+}
 
 template <>
 void JSONReader::read(const Acousmoscribe::SpectralKeyData& skd)
@@ -331,7 +357,7 @@ void DataStreamReader::read(const Acousmoscribe::SpectralKey& sk)
 {
   m_stream << sk.spectralKeyData();
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SpectralKey& sk)
@@ -340,11 +366,12 @@ void DataStreamWriter::write(Acousmoscribe::SpectralKey& sk)
     m_stream >> sd;
     sk.setData(sd);
     checkDelimiter();
-} 
+}
 
 template <>
 void JSONReader::read(const Acousmoscribe::SpectralKey& sk)
 {
+  stream.Key("SpectralKey");
   stream.StartArray();
   stream.Int(sk.nature());
   stream.Int(sk.nature2());
@@ -360,7 +387,7 @@ void JSONReader::read(const Acousmoscribe::SpectralKey& sk)
 template <>
 void JSONWriter::write(Acousmoscribe::SpectralKey& sk)
 {
-  const auto& arr = base.GetArray();
+  const auto& arr = obj["SpectralKey"].toArray();
   Acousmoscribe::Nature n;
   switch (arr[0].GetInt())
   {
@@ -398,7 +425,7 @@ void DataStreamReader::read(const Acousmoscribe::MelodicKeyData& mkd)
 {
   m_stream << mkd.pitch() << mkd.range();
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::MelodicKeyData& mkd)
@@ -409,7 +436,7 @@ void DataStreamWriter::write(Acousmoscribe::MelodicKeyData& mkd)
   mkd.setPitch(p);
   mkd.setRange(r);
   checkDelimiter();
-} 
+}
 
 template <>
 void JSONReader::read(const Acousmoscribe::MelodicKeyData& mkd)
@@ -457,7 +484,7 @@ void DataStreamReader::read(const Acousmoscribe::MelodicKey& mk)
 {
   m_stream << mk.melodicKeyData();
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::MelodicKey& mk)
@@ -466,11 +493,12 @@ void DataStreamWriter::write(Acousmoscribe::MelodicKey& mk)
   m_stream >> mkd;
   mk.setData(mkd);
   checkDelimiter();
-} 
+}
 
 template <>
 void JSONReader::read(const Acousmoscribe::MelodicKey& mk)
 {
+  stream.Key("MelodicKey");
   stream.StartArray();
   stream.Int(mk.pitch());
   stream.Int(mk.range());
@@ -480,7 +508,7 @@ void JSONReader::read(const Acousmoscribe::MelodicKey& mk)
 template <>
 void JSONWriter::write(Acousmoscribe::MelodicKey& mk)
 {
-  const auto& arr = base.GetArray();
+  const auto& arr = obj["MelodicKey"].toArray();
   Acousmoscribe::Pitch p;
   switch (arr[0].GetInt())
   {

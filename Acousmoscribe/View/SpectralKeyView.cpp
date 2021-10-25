@@ -27,6 +27,7 @@ void SpectralKeyView::paint(
     const QStyleOptionGraphicsItem* option,
     QWidget* widget)
 {
+  painter->setRenderHint(QPainter::Antialiasing, true);
   float w = m_width;
   float h = m_height*0.99;
 
@@ -41,7 +42,7 @@ void SpectralKeyView::paint(
 
   QPen p;
   p.setColor(Qt::black);
-  p.setWidth(1);
+  p.setWidth(2);
   painter->setPen(p);
 
   /* Background Rect */
@@ -98,7 +99,7 @@ void SpectralKeyView::paint(
       p.setWidth(4);
       painter->setPen(p);
       painter->drawPoint(w / 2.5, h / 2.5);
-      p.setWidth(1);
+      p.setWidth(2);
       painter->setPen(p);
       break;
 
@@ -154,7 +155,7 @@ void SpectralKeyView::paint(
       p.setWidth(4);
       painter->setPen(p);
       painter->drawPoint(w / 1.3, h / 1.3);
-      p.setWidth(1);
+      p.setWidth(2);
       painter->setPen(p);
       break;
 
@@ -165,61 +166,53 @@ void SpectralKeyView::paint(
   p.setStyle(Qt::SolidLine);
   painter->setPen(p);
 
-  switch (rich)
+  if(rich)
   {
-    case true:
-      if (nature == tonic)
-      {
-        painter->drawLine(QPoint(w / 1.08, h / 6), QPoint(w / 1.015, h / 4.25));
-        painter->drawLine(QPoint(w / 6, h / 1.1), QPoint(w / 4.5, h / 1.02));
-      }
-      else if (nature == inharmonic)
-      {
-        painter->drawLine(QPoint(w / 2.3, h / 9.6), QPoint(w / 2.6, h / 6.2));
-        painter->drawLine(QPoint(w / 4.15, h / 2.85), QPoint(w / 4.9, h / 2.6));
-      }
-      else if (nature == noise)
-      {
-        painter->drawLine(QPoint(w / 2.6, h / 4.2), QPoint(w / 3.7, h / 2.8));
-        if (nature2 != noise)
-          painter->drawLine(QPoint(w / 2.45, h / 2), QPoint(w / 1.85, h / 2.7));
-      }
-      break;
-
-    default:
-      break;
+    if (nature == tonic)
+    {
+      painter->drawLine(QPoint(w / 1.08, h / 6), QPoint(w / 1.015, h / 4.25));
+      painter->drawLine(QPoint(w / 6, h / 1.1), QPoint(w / 4.5, h / 1.02));
+    }
+    else if (nature == inharmonic)
+    {
+      painter->drawLine(QPoint(w / 2.3, h / 9.6), QPoint(w / 2.6, h / 6.2));
+      painter->drawLine(QPoint(w / 4.15, h / 2.85), QPoint(w / 4.9, h / 2.6));
+    }
+    else if (nature == noise)
+    {
+      painter->drawLine(QPoint(w / 2.6, h / 4.2), QPoint(w / 3.7, h / 2.8));
+      if (nature2 != noise)
+        painter->drawLine(QPoint(w / 2.45, h / 2), QPoint(w / 1.85, h / 2.7));
+    }
   }
 
-  switch (rich2)
+  if(rich2)
   {
-    case true:
-      if (nature2 == tonic)
+    if (nature2 == tonic)
+    {
+      painter->drawLine(QPoint(w / 1.15, h / 7.2), QPoint(w / 1.25, h / 14.8));
+      painter->drawLine(QPoint(w / 14.8, h / 1.25), QPoint(w / 6.8, h / 1.12));
+    }
+    else if (nature2 == inharmonic)
+    {
+      painter->drawLine(QPoint(w / 1.9, h / 4.2), QPoint(w / 1.7, h / 6.4));
+      painter->drawLine(QPoint(w / 3.1, h / 2), QPoint(w / 3.9, h / 1.8));
+    }
+    else if (nature2 == noise)
+    {
+      painter->drawLine(QPoint(w / 1.2, h / 1.1), QPoint(w / 1.05, h / 1.3));
+      if (nature == noise)
       {
-        painter->drawLine(QPoint(w / 1.15, h / 7.2), QPoint(w / 1.25, h / 14.8));
-        painter->drawLine(QPoint(w / 14.8, h / 1.25), QPoint(w / 6.8, h / 1.12));
+        painter->drawLine(QPoint(w / 2, h / 1.65), QPoint(w / 1.5, h / 2.3));
       }
-      else if (nature2 == inharmonic)
+      else
       {
-        painter->drawLine(QPoint(w / 1.9, h / 4.2), QPoint(w / 1.7, h / 6.4));
-        painter->drawLine(QPoint(w / 3.1, h / 2), QPoint(w / 3.9, h / 1.8));
+        painter->drawLine(QPoint(w / 1.55, h / 1.3), QPoint(w / 1.3, h / 1.6));
       }
-      else if (nature2 == noise)
-      {
-        painter->drawLine(QPoint(w / 1.2, h / 1.1), QPoint(w / 1.05, h / 1.3));
-        if (nature == noise)
-        {
-          painter->drawLine(QPoint(w / 2, h / 1.65), QPoint(w / 1.5, h / 2.3));
-        }
-        else
-        {
-          painter->drawLine(QPoint(w / 1.55, h / 1.3), QPoint(w / 1.3, h / 1.6));
-        }
-      }
-      break;
-
-    default:
-      break;
+    }
   }
+
+  painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
 QRectF SpectralKeyView::computeRect() const noexcept

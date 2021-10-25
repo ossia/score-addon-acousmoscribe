@@ -23,10 +23,11 @@ SignView::SignView(const Sign& n, Presenter& presenter, View* parent)
 
 void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
+  painter->setRenderHint(QPainter::Antialiasing, true);
 
   QPen p;
   p.setColor(Qt::black);
-  p.setWidth(1);
+  p.setWidth(2);
   painter->setPen(p);
 
   float x_left = boundingRect().left();
@@ -70,7 +71,7 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   painter->drawPolygon(points, 4);
   p.setColor(Qt::black);
   p.setCapStyle(Qt::RoundCap);
-  p.setWidth(1);
+  p.setWidth(2);
   painter->setPen(p);
 
   /* GRAIN */
@@ -154,7 +155,7 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
       p.setWidth(5); // the 4th point is bigger
       painter->setPen(p);
       painter->drawPoint(QPoint(x_pitch, y_pitch));
-      p.setWidth(1);
+      p.setWidth(2);
       painter->setPen(p);
     }
     else
@@ -162,7 +163,7 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
       painter->drawPoint(QPoint(x_pitch, y_pitch));
     }
   }
-  p.setWidth(1);
+  p.setWidth(2);
   painter->setPen(p);
 
   QPoint firstP;
@@ -236,6 +237,8 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   }
 
   painter->drawLine(firstP, secondP);*/
+
+  painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
 QPointF SignView::closestPos(QPointF newPos) const noexcept

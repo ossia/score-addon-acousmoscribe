@@ -19,9 +19,9 @@ ChangeSpectralKeyNature::ChangeSpectralKeyNature(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setNature(nature);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyNature::update(unused_t, unused_t, Nature nature)
@@ -65,9 +65,9 @@ ChangeSpectralKeyNature2::ChangeSpectralKeyNature2(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setNature2(nature2);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyNature2::update(unused_t, unused_t, Nature nature2)
@@ -112,9 +112,9 @@ ChangeSpectralKeyIsRich::ChangeSpectralKeyIsRich(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsRich(isRich);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyIsRich::update(unused_t, unused_t, bool isRich)
@@ -159,9 +159,9 @@ ChangeSpectralKeyIsRich2::ChangeSpectralKeyIsRich2(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsRich2(isRich2);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyIsRich2::update(unused_t, unused_t, bool isRich2)
@@ -206,9 +206,9 @@ ChangeSpectralKeyWarped::ChangeSpectralKeyWarped(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsWarped(isWarped);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyWarped::update(unused_t, unused_t, bool isWarped)
@@ -253,9 +253,9 @@ ChangeSpectralKeyWarped2::ChangeSpectralKeyWarped2(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsWarped2(isWarped2);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyWarped2::update(unused_t, unused_t, bool isWarped2)
@@ -300,9 +300,9 @@ ChangeSpectralKeyIsHybrid::ChangeSpectralKeyIsHybrid(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsHybrid(isHybrid);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyIsHybrid::update(unused_t, unused_t, bool isHybrid)
@@ -348,9 +348,9 @@ ChangeSpectralKeyIsHybrid2::ChangeSpectralKeyIsHybrid2(
 {
   auto& sKey = model.spectralKey.at(to_change);
   SpectralKeyData data = sKey.spectralKeyData();
-  m_before = qMakePair(sKey.id(), data);
+  m_before = std::make_pair(sKey.id(), data);
   data.setIsHybrid2(isHybrid2);
-  m_after = qMakePair(sKey.id(), data);
+  m_after = std::make_pair(sKey.id(), data);
 }
 
 void ChangeSpectralKeyIsHybrid2::update(unused_t, unused_t, bool isHybrid2)

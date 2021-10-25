@@ -99,18 +99,15 @@ Presenter::Presenter(
   model.signs.added.connect<&Presenter::on_signAdded>(this);
   model.signs.removing.connect<&Presenter::on_signRemoving>(this);
 
+  for(auto& k : model.melodicKeys)
+    on_melodicKeyAdded(k);
+  for(auto& k : model.spectralKey)
+    on_spectralKeyAdded(k);
+  for (auto& sign : model.signs)
+    on_signAdded(sign);
 
-  // Default MelodicKey
-  MelodicKeyData mkData = {mid, weak};
-  CommandDispatcher<>{context().context.commandStack}.submit(
-        new AddMelodicKey{model, mkData});
-
-  // Default SpectralKey
-  SpectralKeyData skData;
-  skData.setNature(tonic);
-  skData.setNature2(null);
-  CommandDispatcher<>{context().context.commandStack}.submit(
-        new AddSpectralKey{model, skData});
+  assert(m_melodicKeyView);
+  assert(m_spectralKeyView);
 
   connect(m_view, &View::doubleClicked, this, [&](QPointF pos) {
     CommandDispatcher<>{context().context.commandStack}.submit(
@@ -137,21 +134,10 @@ Presenter::Presenter(
 
   connect(m_view, &View::askContextMenu, this, &Presenter::contextMenuRequested);
 
-
-  for (auto& sign : model.signs)
-  {
-    on_signAdded(sign);
-  }
-#if __has_include(<valgrind/callgrind.h>)
-  // CALLGRIND_START_INSTRUMENTATION;
-#endif
-} 
+}
 
 Presenter::~Presenter()
 {
-#if __has_include(<valgrind/callgrind.h>)
-  // CALLGRIND_STOP_INSTRUMENTATION;
-#endif
 }
 
 
@@ -244,49 +230,49 @@ void Presenter::updateSign(SignView& v)
 // Melodic Key Changed
 
 void Presenter::on_melodicKeyPitchChanged(const MelodicKey& mKey, Pitch pitch){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicKeyPitch{model(), mKey.id(), pitch}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicKeyPitch{model(), mKey.id(), pitch});
 }
 
 void Presenter::on_melodicKeyRangeChanged(const MelodicKey& mKey, Range range){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicKeyRange{model(), mKey.id(), range}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicKeyRange{model(), mKey.id(), range});
 }
 
 
 // Spectral Key Changed
 
 void Presenter::on_spectralKeyNatureChanged(const SpectralKey& sKey, Nature nature){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyNature{model(), sKey.id(), nature}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyNature{model(), sKey.id(), nature});
 }
 
 void Presenter::on_spectralKeyNature2Changed(const SpectralKey& sKey, Nature nature){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyNature2{model(), sKey.id(), nature}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyNature2{model(), sKey.id(), nature});
 }
 
 void Presenter::on_spectralKeyIsRichChanged(const SpectralKey& sKey, bool isRich){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsRich{model(), sKey.id(), isRich}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsRich{model(), sKey.id(), isRich});
 }
 
 void Presenter::on_spectralKeyIsRich2Changed(const SpectralKey& sKey, bool isRich){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsRich2{model(), sKey.id(), isRich}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsRich2{model(), sKey.id(), isRich});
 }
 
 void Presenter::on_spectralKeyIsHybridChanged(const SpectralKey& sKey, bool isHybrid){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsHybrid{model(), sKey.id(), isHybrid}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsHybrid{model(), sKey.id(), isHybrid});
 }
 
 void Presenter::on_spectralKeyIsHybrid2Changed(const SpectralKey& sKey, bool isHybrid){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsHybrid2{model(), sKey.id(), isHybrid}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyIsHybrid2{model(), sKey.id(), isHybrid});
 }
 void Presenter::on_spectralKeyIsWarpedChanged(const SpectralKey& sKey, bool warped){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyWarped{model(), sKey.id(), warped}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyWarped{model(), sKey.id(), warped});
 }
 
 void Presenter::on_spectralKeyIsWarped2Changed(const SpectralKey& sKey, bool warped){
-  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyWarped2{model(), sKey.id(), warped}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ChangeSpectralKeyWarped2{model(), sKey.id(), warped});
 }
 
 
-// ===================================================== SIGN ===================================================== 
+// ===================================================== SIGN =====================================================
 
 void Presenter::on_signMoved(SignView& v)
 {
@@ -330,11 +316,11 @@ void Presenter::on_signScaled(const Sign& sign, double newScale)
   }
 
   auto dt = newScale - sign.duration();
-  CommandDispatcher<>{context().context.commandStack}.submit(new ScaleSigns{model(), signs, dt}); 
+  CommandDispatcher<>{context().context.commandStack}.submit(new ScaleSigns{model(), signs, dt});
 }
 
 
-// --------------------------------------------- Sign/Dynamic Profile ---------------------------------------------      
+// --------------------------------------------- Sign/Dynamic Profile ---------------------------------------------
 
 
 
@@ -345,7 +331,7 @@ void Presenter::on_signVolumeStartChanged(const Sign& sign, float newVolStart)
     auto newDP = sign.dynamicProfile() ;
     newDP.volumeStart = newVolStart ;
 
-    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeDynamicProfile{model(), sign.id(), newDP}); 
+    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeDynamicProfile{model(), sign.id(), newDP});
   }
 };
 
@@ -356,7 +342,7 @@ void Presenter::on_signVolumeEndChanged(const Sign& sign, float newVolEnd)
     auto newDP = sign.dynamicProfile() ;
     newDP.volumeEnd = newVolEnd ;
 
-    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeDynamicProfile{model(), sign.id(), newDP}); 
+    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeDynamicProfile{model(), sign.id(), newDP});
   }
 };
 
@@ -371,7 +357,7 @@ void Presenter::on_signVolumeEndChanged(const Sign& sign, float newVolEnd)
   }
 };*/
 
-// --------------------------------------------- Sign/Melodic Profile ---------------------------------------------      
+// --------------------------------------------- Sign/Melodic Profile ---------------------------------------------
 
 void Presenter::on_signMelodicProfilePitchChanged(const Sign& sign, Pitch newPitch){
   if(sign.melodicProfile().pitch() != newPitch)
@@ -379,7 +365,7 @@ void Presenter::on_signMelodicProfilePitchChanged(const Sign& sign, Pitch newPit
     auto newMP = sign.melodicProfile() ;
     newMP.setPitch(newPitch)  ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
 }
 
@@ -389,7 +375,7 @@ void Presenter::on_signMelodicProfilePitchEndChanged(const Sign& sign, Pitch new
     auto newMP = sign.melodicProfile() ;
     newMP.setPitchEnd(newPitchEnd)  ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
 }
 
@@ -399,11 +385,11 @@ void Presenter::on_signMelodicProfileVariationChanged(const Sign& sign, Variatio
     auto newMP = sign.melodicProfile() ;
     newMP.setVariation(newVar) ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
 }
 
-// --------------------------------------------- Sign/Rhythmic Profile ---------------------------------------------      
+// --------------------------------------------- Sign/Rhythmic Profile ---------------------------------------------
 
 void Presenter::on_signRhythmicProfileSpeedChanged(const Sign& sign, Speed newSpeed)
 {
@@ -412,7 +398,7 @@ void Presenter::on_signRhythmicProfileSpeedChanged(const Sign& sign, Speed newSp
     auto newRP = sign.rhythmicProfile() ;
     newRP.setSpeed(newSpeed)  ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }
 }
 
@@ -423,7 +409,7 @@ void Presenter::on_signRhythmicProfileAccelerationChanged(const Sign& sign, Acce
     auto newRP = sign.rhythmicProfile() ;
     newRP.setAcceleration(newAcc)  ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }
 }
 
@@ -434,17 +420,17 @@ void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, bool new
     auto newRP = sign.rhythmicProfile() ;
     newRP.setIsRandom(newIsRandom)  ;
 
-    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP}); 
+    //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }
 }
 
-// -------------------------------------------------- Sign/Grain  --------------------------------------------------      
+// -------------------------------------------------- Sign/Grain  --------------------------------------------------
 
 void Presenter::on_signGrainChanged(const Sign& sign, Grain g)
 {
   if(sign.grain() != g)
   {
-    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeGrain{model(), sign.id(), g}); 
+    CommandDispatcher<>{context().context.commandStack}.submit(new ChangeGrain{model(), sign.id(), g});
   }
 }
 
@@ -504,7 +490,7 @@ std::vector<Id<Sign>> Presenter::selectedSigns() const
           | transformed([](SignView* v) { return v->sign.id(); }),
       std::back_inserter(res));
   return res;
-  
+
 }
 
 }

@@ -135,14 +135,14 @@ void Sign::setStart(double s) noexcept
   }
 }
 
-void Sign::setDuration(double s) noexcept 
+void Sign::setDuration(double s) noexcept
 {
   if (m_duration != s)
   {
     m_duration = s;
     signChanged();
   }
-} 
+}
 
 void Sign::setDynamicProfile(DynamicProfile d)  {
     _dynamicProfile = d;
@@ -162,7 +162,7 @@ void Sign::setRhythmicProfile(RhythmicProfile d) {
 
 void Sign::setGrain(Grain g)  {
     _grain = g;
-    signChanged(); 
+    signChanged();
 }
 
 void Sign::setData(SignData d)  {
@@ -185,14 +185,14 @@ void DataStreamReader::read(const Acousmoscribe::DynamicProfile& dp)
 {
   m_stream << dp.volumeStart << dp.volumeEnd;
   insertDelimiter();
-} 
+}
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::DynamicProfile& dp)
 {
   m_stream >> dp.volumeStart >> dp.volumeEnd;
   checkDelimiter();
-} 
+}
 
 template <>
 void JSONReader::read(const Acousmoscribe::DynamicProfile& dp)
@@ -207,6 +207,6 @@ template <>
 void JSONWriter::write(Acousmoscribe::DynamicProfile& dp)
 {
   const auto& arr = base.GetArray();
-  dp.volumeStart = arr[2].GetDouble();
-  dp.volumeEnd = arr[3].GetDouble();
+  dp.volumeStart = arr[0].GetDouble();
+  dp.volumeEnd = arr[1].GetDouble();
 }

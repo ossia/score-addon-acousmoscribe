@@ -28,7 +28,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<Sign>, SignData> m_before, m_after;
+  std::pair<Id<Sign>, SignData> m_before, m_after;
 };
 
 class ChangeMelodicProfile final : public score::Command
@@ -48,7 +48,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<Sign>, SignData> m_before, m_after;
+  std::pair<Id<Sign>, SignData> m_before, m_after;
 };
 
 
@@ -70,7 +70,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<Sign>, SignData> m_before, m_after;
+  std::pair<Id<Sign>, SignData> m_before, m_after;
 };
 
 
@@ -92,7 +92,7 @@ protected:
 
 private:
   Path<Model> m_model;
-  QPair<Id<Sign>, SignData> m_before, m_after;
+  std::pair<Id<Sign>, SignData> m_before, m_after;
 };
 
 }

@@ -13,12 +13,12 @@
 
 namespace Acousmoscribe
 {
-    
+
 //Dynamic Profile :
-typedef struct{
+struct DynamicProfile {
     float volumeStart{1};
     float volumeEnd{1};
-}DynamicProfile;
+};
 
 struct SignData
 {
