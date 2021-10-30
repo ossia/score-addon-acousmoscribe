@@ -244,7 +244,7 @@ void DataStreamWriter::write(Acousmoscribe::Model& proc)
   int32_t melok_count;
   m_stream >> melok_count;
 
-  for(; speck_count-- >0;)
+  for(; melok_count-- >0;)
     proc.melodicKeys.add(new Acousmoscribe::MelodicKey{*this, &proc});
 
   checkDelimiter();

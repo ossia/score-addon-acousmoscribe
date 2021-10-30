@@ -53,7 +53,7 @@ void DataStreamWriter::write(Acousmoscribe::MelodicProfile& mp)
     Acousmoscribe::Pitch pe;
     Acousmoscribe::Variation v;
 
-    m_stream >> p >> v;
+    m_stream >> p >> pe >> v;
 
     mp.setPitch(p);
     mp.setPitchEnd(pe);
