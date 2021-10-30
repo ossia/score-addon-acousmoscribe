@@ -22,39 +22,18 @@ enum Nature
 
  struct SpectralKeyData
 {
-    SpectralKeyData() = default;
-    SpectralKeyData(Nature nature, Nature nature2, bool isHybrid, bool isHybrid2, bool isRich, bool isRich2, bool isWarped, bool isWarped2);
-
-    Nature nature() const;
-    Nature nature2() const;
-    bool isHybrid() const;
-    bool isHybrid2() const;
-    bool isRich() const;
-    bool isRich2() const;
-    bool isWarped() const;
-    bool isWarped2() const;
-
-    void setNature(Nature nature);
-    void setNature2(Nature nature);
-    void setIsHybrid(bool h);
-    void setIsHybrid2(bool h);
-    void setIsRich(bool r);
-    void setIsRich2(bool r);
-    void setIsWarped(bool w);
-    void setIsWarped2(bool w);
-
-    Nature m_nature;
-    Nature m_nature2;
-    bool m_isWarped{false};
-    bool m_isWarped2{false};
-    bool m_isHybrid{false};
-    bool m_isHybrid2{false};
-    bool m_isRich{false};
-    bool m_isRich2{false};
+    Nature nature{};
+    Nature nature2{};
+    bool isHybrid{false};
+    bool isHybrid2{false};
+    bool isRich{false};
+    bool isRich2{false};
+    bool isWarped{false};
+    bool isWarped2{false};
 };
 
-class SpectralKey final : public IdentifiedObject<SpectralKey>{
-
+class SpectralKey final : public IdentifiedObject<SpectralKey>
+{
     W_OBJECT(SpectralKey)
     SCORE_SERIALIZE_FRIENDS
 
@@ -63,20 +42,13 @@ public:
 
     SpectralKey(const Id<SpectralKey>& id, QObject* parent);
     SpectralKey(const Id<SpectralKey>& id, SpectralKeyData n, QObject* parent);
-
-    /* template <typename DeserializerVisitor, enable_if_deserializer<DeserializerVisitor>* = nullptr>
-    SpectralKey(DeserializerVisitor&& vis, QObject* parent) : IdentifiedObject<SpectralKey>{vis, parent}
-    {
-        vis.writeTo(*this);
-    } */
+    ~SpectralKey() = default;
 
     template <typename Impl>
     SpectralKey(Impl&& vis, QObject* parent) : IdentifiedObject{vis, parent}
     {
       vis.writeTo(*this);
     }
-
-    //~SpectralKey();
 
     Nature nature() const noexcept;
     Nature nature2() const noexcept;
@@ -102,8 +74,8 @@ public:
 
     void spectralKeyChanged() W_SIGNAL(spectralKeyChanged);
 private:
-    Nature m_nature;
-    Nature m_nature2;
+    Nature m_nature{};
+    Nature m_nature2{};
     bool m_isHybrid{false};
     bool m_isHybrid2{false};
     bool m_isRich{false};

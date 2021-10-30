@@ -21,28 +21,13 @@ enum Acceleration
     decelerating
 };
 
-class RhythmicProfile {
-
-public:
-    RhythmicProfile(){}
-    RhythmicProfile(Speed rhythmVar, Acceleration acceleration, bool random);
-    ~RhythmicProfile();
-    Speed speed() const noexcept;
-    Acceleration acceleration() const noexcept;
-    bool isRandom() const noexcept;
-
-    void setSpeed(Speed speed);
-    void setAcceleration(Acceleration acceleration);
-    void setIsRandom(bool rand);
-
-private:
-    Speed m_speed{continuous};
-    Acceleration m_acceleration{constant};
-    bool m_isRandom{false};
+struct RhythmicProfile
+{
+    Speed speed{continuous};
+    Acceleration acceleration{constant};
+    bool isRandom{false};
+    bool operator==(const RhythmicProfile&) const noexcept = default;
 };
 
-inline bool operator==(RhythmicProfile const rp1, RhythmicProfile const rp2) {
-  return rp1.acceleration() == rp2.acceleration() && rp1.speed() == rp2.speed() && rp1.isRandom() == rp2.isRandom();
-}
 }
 #endif

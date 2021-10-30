@@ -22,7 +22,7 @@ MoveSigns::MoveSigns(
     auto& sign = model.signs.at(sign_id);
     SignData data = sign.signData();
     m_before.push_back(std::make_pair(sign.id(), data));
-    data.m_start = std::max(data.m_start + t_delta, 0.);
+    data.start = std::max(data.start + t_delta, 0.);
     m_after.push_back(std::make_pair(sign.id(), data));
   }
 }
@@ -33,7 +33,7 @@ void MoveSigns::undo(const score::DocumentContext& ctx) const
   for (const auto& sign : m_before)
   {
     auto& n = model.signs.at(sign.first);
-    n.setStart(sign.second.start());
+    n.setStart(sign.second.start);
   }
   model.signsNeedUpdate();
 }
@@ -44,7 +44,7 @@ void MoveSigns::redo(const score::DocumentContext& ctx) const
   for (const auto& sign : m_after)
   {
     auto& n = model.signs.at(sign.first);
-    n.setStart(sign.second.start());
+    n.setStart(sign.second.start);
   }
   model.signsNeedUpdate();
 }
@@ -54,7 +54,7 @@ void MoveSigns::update(unused_t, unused_t, double t_delta)
   for(int i = 0, N = m_before.size(); i < N; i++)
   {
     auto& data = m_before[i].second;
-    m_after[i].second.setStart(std::max(data.start() + t_delta, 0.));
+    m_after[i].second.start = std::max(data.start + t_delta, 0.);
   }
 }
 

@@ -20,13 +20,13 @@ ChangeDynamicProfile::ChangeDynamicProfile(
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setDynamicProfile(dyn);
+  data.dynamicProfile = dyn;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeDynamicProfile::update(unused_t, unused_t, DynamicProfile dyn)
 {
-  m_after.second.setDynamicProfile(dyn);
+  m_after.second.dynamicProfile = dyn;
 }
 
 void ChangeDynamicProfile::undo(const score::DocumentContext& ctx) const
@@ -34,7 +34,7 @@ void ChangeDynamicProfile::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.signs.at(mKey.first);
-  m.setDynamicProfile(mKey.second.dynamicProfile());
+  m.setDynamicProfile(mKey.second.dynamicProfile);
 }
 
 void ChangeDynamicProfile::redo(const score::DocumentContext& ctx) const
@@ -42,7 +42,7 @@ void ChangeDynamicProfile::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.signs.at(mKey.first);
-  m.setDynamicProfile(mKey.second.dynamicProfile());
+  m.setDynamicProfile(mKey.second.dynamicProfile);
 }
 
 void ChangeDynamicProfile::serializeImpl(DataStreamInput& s) const
@@ -67,13 +67,13 @@ ChangeMelodicProfile::ChangeMelodicProfile(
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setMelodicProfile(melo);
+  data.melodicProfile = melo;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicProfile::update(unused_t, unused_t, MelodicProfile melo)
 {
-  m_after.second.setMelodicProfile(melo);
+  m_after.second.melodicProfile = melo;
 }
 
 void ChangeMelodicProfile::undo(const score::DocumentContext& ctx) const
@@ -81,7 +81,7 @@ void ChangeMelodicProfile::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.signs.at(mKey.first);
-  m.setMelodicProfile(mKey.second.melodicProfile());
+  m.setMelodicProfile(mKey.second.melodicProfile);
 }
 
 void ChangeMelodicProfile::redo(const score::DocumentContext& ctx) const
@@ -89,7 +89,7 @@ void ChangeMelodicProfile::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.signs.at(mKey.first);
-  m.setMelodicProfile(mKey.second.melodicProfile());
+  m.setMelodicProfile(mKey.second.melodicProfile);
 }
 
 void ChangeMelodicProfile::serializeImpl(DataStreamInput& s) const
@@ -114,13 +114,13 @@ ChangeRhythmicProfile::ChangeRhythmicProfile(
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setRhythmicProfile(rhythm);
+  data.rhythmicProfile = rhythm;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeRhythmicProfile::update(unused_t, unused_t, RhythmicProfile rhythm)
 {
-  m_after.second.setRhythmicProfile(rhythm);
+  m_after.second.rhythmicProfile = rhythm;
 }
 
 void ChangeRhythmicProfile::undo(const score::DocumentContext& ctx) const
@@ -128,7 +128,7 @@ void ChangeRhythmicProfile::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.signs.at(mKey.first);
-  m.setRhythmicProfile(mKey.second.rhythmicProfile());
+  m.setRhythmicProfile(mKey.second.rhythmicProfile);
 }
 
 void ChangeRhythmicProfile::redo(const score::DocumentContext& ctx) const
@@ -136,7 +136,7 @@ void ChangeRhythmicProfile::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.signs.at(mKey.first);
-  m.setRhythmicProfile(mKey.second.rhythmicProfile());
+  m.setRhythmicProfile(mKey.second.rhythmicProfile);
 }
 
 void ChangeRhythmicProfile::serializeImpl(DataStreamInput& s) const
@@ -161,13 +161,13 @@ ChangeGrain::ChangeGrain(
   auto& mKey = model.signs.at(to_change);
   SignData data = mKey.signData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setGrain(grain);
+  data.grain = grain;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeGrain::update(unused_t, unused_t, Grain grain)
 {
-  m_after.second.setGrain(grain);
+  m_after.second.grain = grain;
 }
 
 void ChangeGrain::undo(const score::DocumentContext& ctx) const
@@ -175,7 +175,7 @@ void ChangeGrain::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.signs.at(mKey.first);
-  m.setGrain(mKey.second.grain());
+  m.setGrain(mKey.second.grain);
 }
 
 void ChangeGrain::redo(const score::DocumentContext& ctx) const
@@ -183,7 +183,7 @@ void ChangeGrain::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.signs.at(mKey.first);
-  m.setGrain(mKey.second.grain());
+  m.setGrain(mKey.second.grain);
 }
 
 void ChangeGrain::serializeImpl(DataStreamInput& s) const

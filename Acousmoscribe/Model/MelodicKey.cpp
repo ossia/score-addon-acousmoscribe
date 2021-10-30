@@ -15,33 +15,9 @@ W_OBJECT_IMPL(Acousmoscribe::MelodicKey)
 namespace Acousmoscribe{
 
 
-/**************************
- * PARTIE MELPDIC KEY DATA
- **************************/
-MelodicKeyData::MelodicKeyData(Pitch p, Range r) 
-    : m_pitch{p}, m_range{r}
-{   
-}
-
-Pitch MelodicKeyData::pitch() const {
-    return m_pitch;
-}
-
-Range MelodicKeyData::range() const {
-    return m_range;
-}
-
-void MelodicKeyData::setPitch(Pitch p){
-    m_pitch = p;
-}
-
-void MelodicKeyData::setRange(Range r){
-    m_range = r;
-}
-
 /*********************
  * PARTIE MELODIC KEY
- *********************/ 
+ *********************/
 
 MelodicKey::MelodicKey(const Id<MelodicKey>& id, QObject* parent)
     : IdentifiedObject<MelodicKey>(id, QStringLiteral("MelodicKey"), parent)
@@ -50,41 +26,47 @@ MelodicKey::MelodicKey(const Id<MelodicKey>& id, QObject* parent)
 
 MelodicKey::MelodicKey(const Id<MelodicKey>& id, MelodicKeyData m, QObject* parent)
     : IdentifiedObject<MelodicKey>(id, QStringLiteral("MelodicKey"), parent)
-    , m_pitch{m.m_pitch}
-    , m_range{m.m_range}
-    {}
+    , m_impl{m}
+    {
 
-/* MelodicKey::MelodicKey(Pitch pitch, Range range)
-    : m_pitch(pitch), m_range(range) 
-{
-} */
-
-//MelodicKey::~MelodicKey(){}
-
-Pitch MelodicKey::pitch() const noexcept { 
-    return m_pitch;
 }
 
-Range MelodicKey::range() const noexcept { 
-    return m_range;
+Pitch MelodicKey::pitch() const noexcept {
+    return m_impl.pitch;
+}
+
+Range MelodicKey::range() const noexcept {
+    return m_impl.range;
 }
 
 MelodicKeyData MelodicKey::melodicKeyData() const {
-    return MelodicKeyData(m_pitch, m_range);
+    return m_impl;
+}
+
+void MelodicKey::setMelodicKeyData(const MelodicKeyData& k)
+{
+  if(k != m_impl)
+  {
+    m_impl = k;
+    melodicKeyChanged();
+  }
 }
 
 void MelodicKey::setPitch(Pitch pitch) {
-    m_pitch = pitch;
-    
+  if(pitch != m_impl.pitch)
+  {
+    m_impl.pitch = pitch;
+    melodicKeyChanged();
+  }
 }
 
 void MelodicKey::setRange(Range range) {
-    m_range = range;
+  if(range != m_impl.range)
+  {
+    m_impl.range = range;
+    melodicKeyChanged();
+  }
 }
 
-void MelodicKey::setData(MelodicKeyData mkd){
-    m_pitch = mkd.pitch();
-    m_range = mkd.range();
-}
 
 }

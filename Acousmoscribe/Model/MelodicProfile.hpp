@@ -22,26 +22,13 @@ enum Variation
     random_variation
 };
 
-class MelodicProfile{
-public:
-    MelodicProfile(){}
-    MelodicProfile(Pitch pitch, Pitch pitchEnd, Variation var);
-    ~MelodicProfile();
-    void setPitch(Pitch pitch);
-    void setPitchEnd(Pitch pitchEnd);
-    void setVariation(Variation variation);
-    Pitch pitch() const;
-    Pitch pitchEnd() const;
-    Variation variation() const;
+struct MelodicProfile
+{
+    Pitch pitch{mid};
+    Pitch pitchEnd{mid};
+    Variation var{none};
 
-private:
-    Pitch m_pitch{mid};
-    Pitch m_pitchEnd{mid};
-    Variation m_var{none};
+    bool operator==(const MelodicProfile& other) const noexcept = default;
 };
-
-inline bool operator==(MelodicProfile const mp1, MelodicProfile const mp2){
-  return mp1.pitch() == mp2.pitch() && mp1.variation() == mp2.variation();
-}
 
 }

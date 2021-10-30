@@ -13,55 +13,46 @@
 namespace Acousmoscribe {
 
 enum Range{
-    weak = 0,
-    normal,
-    strong
+  weak = 0,
+  normal,
+  strong
 };
 struct MelodicKeyData{
-    MelodicKeyData() = default;
-    MelodicKeyData(Pitch p, Range r);
+  Pitch pitch{};
+  Range range{};
 
-    Pitch pitch() const;
-    Range range() const;
-
-    void setPitch(Pitch p);
-    void setRange(Range r);
-
-    Pitch m_pitch;
-    Range m_range;
+  bool operator==(const MelodicKeyData&) const noexcept = default;
 };
 
-class MelodicKey final : public IdentifiedObject<MelodicKey>
+class MelodicKey final
+    : public IdentifiedObject<MelodicKey>
 {
-    W_OBJECT(MelodicKey)
-    SCORE_SERIALIZE_FRIENDS
+  W_OBJECT(MelodicKey)
+  SCORE_SERIALIZE_FRIENDS
 public:
-    Selectable selection;
+  Selectable selection;
 
-    MelodicKey(const Id<MelodicKey>& id, QObject* parent);
-    MelodicKey(const Id<MelodicKey>& id, MelodicKeyData n, QObject* parent);
+  MelodicKey(const Id<MelodicKey>& id, QObject* parent);
+  MelodicKey(const Id<MelodicKey>& id, MelodicKeyData n, QObject* parent);
 
-    template <typename Impl>
-    MelodicKey(Impl&& vis, QObject* parent) : IdentifiedObject{vis, parent}
-    {
-      vis.writeTo(*this);
-    }
+  template <typename Impl>
+  MelodicKey(Impl&& vis, QObject* parent) : IdentifiedObject{vis, parent}
+  {
+    vis.writeTo(*this);
+  }
 
-    //MelodicKey(Pitch pitch, Range range);
-    //~MelodicKey();
+  Pitch pitch() const noexcept;
+  Range range() const noexcept;
 
-    Pitch pitch() const noexcept;
-    Range range() const noexcept;
-    MelodicKeyData melodicKeyData() const;
+  void setPitch(Pitch pitch);
+  void setRange(Range range);
 
-    void setPitch(Pitch pitch);
-    void setRange(Range range);
-    void setData(MelodicKeyData mkd);
-
-    void melodicKeyChanged() W_SIGNAL(melodicKeyChanged);
+  MelodicKeyData melodicKeyData() const;
+  void setMelodicKeyData(const MelodicKeyData& k);
+  void melodicKeyChanged() W_SIGNAL(melodicKeyChanged);
+  PROPERTY(MelodicKeyData, melodicKey READ melodicKeyData WRITE setMelodicKeyData NOTIFY melodicKeyChanged)
 private:
-    Pitch m_pitch{};
-    Range m_range{};
+  MelodicKeyData m_impl{};
 };
 
 }

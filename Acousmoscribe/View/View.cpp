@@ -29,7 +29,7 @@ View::View(QGraphicsItem* parent) : Process::LayerView{parent}
 
   m_fragmentCache.reserve(20);
 
-  
+
 }
 
 View::~View()
@@ -80,11 +80,11 @@ SignData View::signAtPos(QPointF point) const
 {
 
   SignData s;
-  s.m_start = std::max(0., point.x() / m_defaultW);
-  s.m_duration = 0.1;
+  s.start = std::max(0., point.x() / m_defaultW);
+  s.duration = 0.1;
   DynamicProfile dyn = {1,1};
-  s.setDynamicProfile(dyn);
-  
+  s.dynamicProfile = dyn;
+
   return s;
 }
 

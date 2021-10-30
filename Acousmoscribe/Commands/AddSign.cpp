@@ -14,9 +14,6 @@ namespace Acousmoscribe
 AddSign::AddSign(const Model& model, const SignData& n)
     : m_model{model}, m_id{getStrongId(model.signs)}, m_sign{n}
 {
-  std::cout << "entré dans addsign\n";
-  std::cout << "start : " << n.start() << "\n";
-  std::cout << "duration : " << n.duration() << "\n";
 
 }
 

@@ -18,36 +18,20 @@ namespace Acousmoscribe
 struct DynamicProfile {
     float volumeStart{1};
     float volumeEnd{1};
+    bool operator==(const DynamicProfile&) const noexcept = default;
 };
 
 struct SignData
 {
-    SignData() = default;
-    SignData(double s, double d, Grain g, DynamicProfile dp, MelodicProfile mp, RhythmicProfile rp);
-    double start() const;
-    double duration() const;
-    double end() const;
+    double start{};
+    double duration{};
 
-    DynamicProfile dynamicProfile() const;
-    MelodicProfile melodicProfile() const;
-    RhythmicProfile rhythmicProfile() const;
-    Grain grain() const;
+    Grain grain{smooth};
+    DynamicProfile dynamicProfile{};
+    MelodicProfile melodicProfile{};
+    RhythmicProfile rhythmicProfile{};
 
-    void setStart(double s) noexcept;
-    void setDuration(double s) noexcept;
-
-    void setDynamicProfile(DynamicProfile dp);
-    void setMelodicProfile(MelodicProfile mp);
-    void setRhythmicProfile(RhythmicProfile rp);
-    void setGrain(Grain g);
-
-    double m_start{};
-    double m_duration{};
-
-    Grain m_grain{smooth};
-    DynamicProfile m_dynamicProfile;
-    MelodicProfile m_melodicProfile;
-    RhythmicProfile m_rhythmicProfile;
+    bool operator==(const SignData&) const noexcept = default;
 };
 
 class Sign final : public IdentifiedObject<Sign>
@@ -107,22 +91,8 @@ private:
     double m_start{};
     double m_duration{};
     Grain _grain{smooth};
-    DynamicProfile _dynamicProfile;
-    MelodicProfile _melodicProfile;
-    RhythmicProfile _rhythmicProfile;
+    DynamicProfile _dynamicProfile{};
+    MelodicProfile _melodicProfile{};
+    RhythmicProfile _rhythmicProfile{};
 };
-
-
-inline bool operator==(DynamicProfile const dp1, DynamicProfile const dp2){
-  return dp1.volumeStart == dp2.volumeStart && dp1.volumeEnd == dp2.volumeEnd;
-}
-
-inline bool operator==(Sign const s1, Sign const s2){
-    return s1.duration() == s2.duration()
-        && s1.start() == s2.start()
-        && s1.grain() == s2.grain()
-        && s1.dynamicProfile() == s2.dynamicProfile()
-        && s1.melodicProfile() == s2.melodicProfile()
-        && s1.rhythmicProfile() == s2.rhythmicProfile();
-}
 }

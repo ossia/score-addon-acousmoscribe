@@ -360,30 +360,30 @@ void Presenter::on_signVolumeEndChanged(const Sign& sign, float newVolEnd)
 // --------------------------------------------- Sign/Melodic Profile ---------------------------------------------
 
 void Presenter::on_signMelodicProfilePitchChanged(const Sign& sign, Pitch newPitch){
-  if(sign.melodicProfile().pitch() != newPitch)
+  if(sign.melodicProfile().pitch != newPitch)
   {
     auto newMP = sign.melodicProfile() ;
-    newMP.setPitch(newPitch)  ;
+    newMP.pitch = newPitch;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
 }
 
 void Presenter::on_signMelodicProfilePitchEndChanged(const Sign& sign, Pitch newPitchEnd){
-  if(sign.melodicProfile().pitchEnd() != newPitchEnd)
+  if(sign.melodicProfile().pitchEnd != newPitchEnd)
   {
-    auto newMP = sign.melodicProfile() ;
-    newMP.setPitchEnd(newPitchEnd)  ;
+    auto newMP = sign.melodicProfile();
+    newMP.pitchEnd = newPitchEnd;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
 }
 
 void Presenter::on_signMelodicProfileVariationChanged(const Sign& sign, Variation newVar){
-  if(sign.melodicProfile().variation() != newVar)
+  if(sign.melodicProfile().var != newVar)
   {
     auto newMP = sign.melodicProfile() ;
-    newMP.setVariation(newVar) ;
+    newMP.var = newVar;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeMelodicProfile{model(), sign.id(), newMP});
   }
@@ -393,10 +393,10 @@ void Presenter::on_signMelodicProfileVariationChanged(const Sign& sign, Variatio
 
 void Presenter::on_signRhythmicProfileSpeedChanged(const Sign& sign, Speed newSpeed)
 {
-  if(sign.rhythmicProfile().speed() != newSpeed)
+  if(sign.rhythmicProfile().speed != newSpeed)
   {
     auto newRP = sign.rhythmicProfile() ;
-    newRP.setSpeed(newSpeed)  ;
+    newRP.speed = newSpeed ;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }
@@ -404,10 +404,10 @@ void Presenter::on_signRhythmicProfileSpeedChanged(const Sign& sign, Speed newSp
 
 void Presenter::on_signRhythmicProfileAccelerationChanged(const Sign& sign, Acceleration newAcc)
 {
-  if(sign.rhythmicProfile().acceleration() != newAcc)
+  if(sign.rhythmicProfile().acceleration != newAcc)
   {
     auto newRP = sign.rhythmicProfile() ;
-    newRP.setAcceleration(newAcc)  ;
+    newRP.acceleration = newAcc  ;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }
@@ -415,10 +415,10 @@ void Presenter::on_signRhythmicProfileAccelerationChanged(const Sign& sign, Acce
 
 void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, bool newIsRandom)
 {
-  if(sign.rhythmicProfile().isRandom() != newIsRandom)
+  if(sign.rhythmicProfile().isRandom != newIsRandom)
   {
     auto newRP = sign.rhythmicProfile() ;
-    newRP.setIsRandom(newIsRandom)  ;
+    newRP.isRandom = newIsRandom;
 
     //CommandDispatcher<>{context().context.commandStack}.submit(new ChangeRhythmicProfile{model(), sign.id(), newRP});
   }

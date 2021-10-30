@@ -14,51 +14,6 @@ namespace Acousmoscribe
 {
 
 /*********************
- * PARTIE SIGN DATA
- *********************/
-SignData::SignData(double s, double d, Grain g, DynamicProfile dp, MelodicProfile mp, RhythmicProfile rp)
-    : m_start{s}, m_duration{d}, m_grain{g}, m_dynamicProfile{dp}, m_melodicProfile{mp}, m_rhythmicProfile{rp}
-{
-}
-
-double SignData::start() const {
-  return m_start;
-}
-
-double SignData::duration() const {
-  return m_duration;
-}
-
-double SignData::end() const {
-  return m_start + m_duration;
-}
-
-DynamicProfile SignData::dynamicProfile() const {
-  return m_dynamicProfile;
-}
-
-MelodicProfile SignData::melodicProfile() const {
-  return m_melodicProfile;
-}
-
-RhythmicProfile SignData::rhythmicProfile() const {
-  return m_rhythmicProfile;
-}
-
-Grain SignData::grain() const {
-  return m_grain;
-}
-
-
-void SignData::setStart(double s) noexcept { m_start = s; }
-void SignData::setDuration(double s) noexcept { m_duration = s; }
-void SignData::setDynamicProfile(DynamicProfile dp) {m_dynamicProfile = dp; }
-void SignData::setMelodicProfile(MelodicProfile mp) {m_melodicProfile = mp; }
-void SignData::setRhythmicProfile(RhythmicProfile rp) {m_rhythmicProfile = rp; }
-void SignData::setGrain(Grain g) {m_grain = g; }
-
-
-/*********************
  * PARTIE SIGN
  *********************/
 Sign::Sign(const Id<Sign>& id, QObject* parent)
@@ -67,12 +22,12 @@ Sign::Sign(const Id<Sign>& id, QObject* parent)
 
 Sign::Sign(const Id<Sign>& id, SignData s, QObject* parent)
     : IdentifiedObject<Sign>(id, QStringLiteral("Sign"), parent)
-    , m_start(s.m_start)
-    , m_duration(s.m_duration)
-    , _grain(s.m_grain)
-    , _melodicProfile(s.m_melodicProfile)
-    , _dynamicProfile(s.m_dynamicProfile)
-    , _rhythmicProfile(s.m_rhythmicProfile)
+    , m_start(s.start)
+    , m_duration(s.duration)
+    , _grain(s.grain)
+    , _dynamicProfile(s.dynamicProfile)
+    , _melodicProfile(s.melodicProfile)
+    , _rhythmicProfile(s.rhythmicProfile)
     {}
 
 double Sign::start() const noexcept {
@@ -166,12 +121,12 @@ void Sign::setGrain(Grain g)  {
 }
 
 void Sign::setData(SignData d)  {
-    m_start = d.m_start;
-    m_duration = d.m_duration;
-    _dynamicProfile = d.m_dynamicProfile;
-    _melodicProfile = d.m_melodicProfile;
-    _rhythmicProfile = d.m_rhythmicProfile;
-    _grain = d.m_grain;
+    m_start = d.start;
+    m_duration = d.duration;
+    _dynamicProfile = d.dynamicProfile;
+    _melodicProfile = d.melodicProfile;
+    _rhythmicProfile = d.rhythmicProfile;
+    _grain = d.grain;
     signChanged();
 }
 

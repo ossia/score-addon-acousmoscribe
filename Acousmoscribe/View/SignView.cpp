@@ -36,16 +36,16 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   float h = boundingRect().height() * 0.99;
 
   Grain grain = sign.grain();
-  Speed speed = sign.rhythmicProfile().speed();
-  Acceleration acc = sign.rhythmicProfile().acceleration();
+  Speed speed = sign.rhythmicProfile().speed;
+  Acceleration acc = sign.rhythmicProfile().acceleration;
 
   double duration = sign.duration();
   float volumeStart = sign.dynamicProfile().volumeStart;
   float volumeEnd = sign.dynamicProfile().volumeEnd;
   float volumeUsed;
 
-  Pitch pitch = sign.melodicProfile().pitch();
-  Pitch pitchEnd = sign.melodicProfile().pitchEnd();
+  Pitch pitch = sign.melodicProfile().pitch;
+  Pitch pitchEnd = sign.melodicProfile().pitchEnd;
 
   QPointF a(0, h);
   QPointF b(0, h * (1 - volumeStart));
@@ -493,28 +493,28 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
       }
       case ChangeMelodicProfilePitch:
       {
-        Pitch p = (Pitch)(((int)sign.melodicProfile().pitch() + 1) % 7);
+        Pitch p = (Pitch)(((int)sign.melodicProfile().pitch + 1) % 7);
         m_presenter.on_signMelodicProfilePitchChanged(sign, p);
         std::cout << "done on_signPitchChanged\n";
         break;
       }
       case ChangeMelodicProfilePitchEnd:
       {
-        Pitch pe = (Pitch)(((int)sign.melodicProfile().pitchEnd() + 1) % 7);
+        Pitch pe = (Pitch)(((int)sign.melodicProfile().pitchEnd + 1) % 7);
         m_presenter.on_signMelodicProfilePitchEndChanged(sign, pe);
         std::cout << "done on_signPitchEndChanged\n";
         break;
       }
       case ChangeMelodicProfileVariation:
       {
-        Variation v = (Variation)(((int)sign.melodicProfile().variation() + 1) % 2);
+        Variation v = (Variation)(((int)sign.melodicProfile().var + 1) % 2);
         m_presenter.on_signMelodicProfileVariationChanged(sign, v);
         std::cout << "done on_signVariationChanged\n";
         break;
       }
       case ChangeRhythmicProfileSpeed:
       {
-        Speed s = (Speed)(((int)sign.rhythmicProfile().speed() + 1) % 4);
+        Speed s = (Speed)(((int)sign.rhythmicProfile().speed + 1) % 4);
         m_presenter.on_signRhythmicProfileSpeedChanged(sign, s);
         std::cout << "done on_signSpeedChanged\n";
         break;
@@ -529,7 +529,7 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
       case ChangeRhythmicProfileAcceleration:
       {
         Acceleration a
-            = (Acceleration)(((Acceleration)sign.rhythmicProfile().acceleration() + 1) % 3);
+            = (Acceleration)(((Acceleration)sign.rhythmicProfile().acceleration + 1) % 3);
         m_presenter.on_signRhythmicProfileAccelerationChanged(sign, a);
         std::cout << "done on_signAccelerationChanged\n";
         break;

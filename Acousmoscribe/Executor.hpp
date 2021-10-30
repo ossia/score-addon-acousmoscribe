@@ -10,7 +10,7 @@ class ProcessExecutorComponent final
     : public Execution::ProcessComponent_T<
           Acousmoscribe::Model, ossia::node_process>
 {
-  COMPONENT_METADATA("00000000-0000-0000-0000-000000000000")
+  COMPONENT_METADATA("918a0fb8-1844-42db-b470-a88494441bca")
 public:
   ProcessExecutorComponent(
       Model& element, const Execution::Context& ctx, QObject* parent);

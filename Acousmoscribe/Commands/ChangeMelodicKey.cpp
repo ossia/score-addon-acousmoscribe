@@ -16,13 +16,13 @@ ChangeMelodicKeyPitch::ChangeMelodicKeyPitch(
   auto& mKey = model.melodicKeys.at(to_change);
   MelodicKeyData data = mKey.melodicKeyData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setPitch(pitch);
+  data.pitch = pitch;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicKeyPitch::update(unused_t, unused_t, Pitch pitch)
 {
-  m_after.second.setPitch(pitch);
+  m_after.second.pitch = pitch;
 }
 
 void ChangeMelodicKeyPitch::undo(const score::DocumentContext& ctx) const
@@ -30,7 +30,7 @@ void ChangeMelodicKeyPitch::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.melodicKeys.at(mKey.first);
-  m.setPitch(mKey.second.pitch());
+  m.setPitch(mKey.second.pitch);
 }
 
 void ChangeMelodicKeyPitch::redo(const score::DocumentContext& ctx) const
@@ -38,7 +38,7 @@ void ChangeMelodicKeyPitch::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.melodicKeys.at(mKey.first);
-  m.setPitch(mKey.second.pitch());
+  m.setPitch(mKey.second.pitch);
 }
 
 void ChangeMelodicKeyPitch::serializeImpl(DataStreamInput& s) const
@@ -61,13 +61,13 @@ ChangeMelodicKeyRange::ChangeMelodicKeyRange(
   auto& mKey = model.melodicKeys.at(to_change);
   MelodicKeyData data = mKey.melodicKeyData();
   m_before = std::make_pair(mKey.id(), data);
-  data.setRange(range);
+  data.range = range;
   m_after = std::make_pair(mKey.id(), data);
 }
 
 void ChangeMelodicKeyRange::update(unused_t, unused_t, Range range)
 {
-  m_after.second.setRange(range);
+  m_after.second.range = range;
 }
 
 void ChangeMelodicKeyRange::undo(const score::DocumentContext& ctx) const
@@ -75,7 +75,7 @@ void ChangeMelodicKeyRange::undo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_before;
   auto& m = model.melodicKeys.at(mKey.first);
-  m.setRange(mKey.second.range());
+  m.setRange(mKey.second.range);
 }
 
 void ChangeMelodicKeyRange::redo(const score::DocumentContext& ctx) const
@@ -83,7 +83,7 @@ void ChangeMelodicKeyRange::redo(const score::DocumentContext& ctx) const
   auto& model = m_model.find(ctx);
   auto& mKey = m_after;
   auto& m = model.melodicKeys.at(mKey.first);
-  m.setRange(mKey.second.range());
+  m.setRange(mKey.second.range);
 }
 
 void ChangeMelodicKeyRange::serializeImpl(DataStreamInput& s) const

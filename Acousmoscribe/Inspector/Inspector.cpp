@@ -1,5 +1,5 @@
 #include "Inspector.hpp"
-//#include "../View/View.hpp" 
+//#include "../View/View.hpp"
 
 #include <score/document/DocumentContext.hpp>
 
@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QPainter>
 #include <QCheckBox>
+#include <QFrame>
 #include <QComboBox>
 #include <QRadioButton>
 #include <QButtonGroup>
@@ -26,23 +27,26 @@ InspectorWidget::InspectorWidget(
   /* text display */
   QLabel *melodique = new QLabel;
   lay->addWidget(melodique);
-  melodique->setText("clé spectrale\n");
+  melodique->setText("Clef spectrale\n");
 
-  lay->addWidget(new QLabel());
+  auto add_line = [&]
+  {
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    lay->addWidget(line);
+  };
+
+  add_line();
 
   /* check button */
-  /*QCheckBox *check1 = new QCheckBox("&tonique", parent);
-  QCheckBox *check2 = new QCheckBox("&inharmonique", parent);
-  QCheckBox *check3 = new QCheckBox("&bruit", parent);
-  QCheckBox *check3 = new QCheckBox("&hybride", parent);*/
-
   QButtonGroup *group = new QButtonGroup;
-  QPushButton *r_tonic = new QPushButton("&tonique");
+  QPushButton *r_tonic = new QPushButton("&Tonique");
   r_tonic->setCheckable(true);
   r_tonic->setChecked(true);
-  QPushButton *r_qinharm = new QPushButton("&inharmonique");
+  QPushButton *r_qinharm = new QPushButton("&Inharmonique");
   r_qinharm->setCheckable(true);
-  QPushButton *r_noise = new QPushButton("&bruit");
+  QPushButton *r_noise = new QPushButton("&Bruit");
   r_noise->setCheckable(true);
 
   group->addButton(r_tonic, 1);
@@ -53,15 +57,17 @@ InspectorWidget::InspectorWidget(
   lay->addWidget(r_qinharm);
   lay->addWidget(r_noise);
 
+  add_line();
+
   QButtonGroup *group2 = new QButtonGroup;
-  QPushButton *r_poor = new QPushButton("&pauvre");
+  QPushButton *r_poor = new QPushButton("&Pauvre");
   r_poor->setCheckable(true);
   r_poor->setChecked(true);
-  QPushButton *r_rich = new QPushButton("&riche");
+  QPushButton *r_rich = new QPushButton("&Riche");
   r_rich->setCheckable(true);
-  QPushButton *r_hybrid = new QPushButton("&hybride");
+  QPushButton *r_hybrid = new QPushButton("&Hybride");
   r_hybrid->setCheckable(true);
-  
+
   group2->addButton(r_poor, 1);
   group2->addButton(r_rich, 2);
   group2->addButton(r_hybrid, 3);
@@ -70,13 +76,14 @@ InspectorWidget::InspectorWidget(
   lay->addWidget(r_rich);
   lay->addWidget(r_hybrid);
 
+  add_line();
   QButtonGroup *group3 = new QButtonGroup;
-  QPushButton *r_tonic2 = new QPushButton("&tonique");
+  QPushButton *r_tonic2 = new QPushButton("&Tonique");
   r_tonic2->setCheckable(true);
   r_tonic2->setChecked(true);
-  QPushButton *r_qinharm2 = new QPushButton("&inharmonique");
+  QPushButton *r_qinharm2 = new QPushButton("&Inharmonique");
   r_qinharm2->setCheckable(true);
-  QPushButton *r_noise2 = new QPushButton("&bruit");
+  QPushButton *r_noise2 = new QPushButton("&Bruit");
   r_noise2->setCheckable(true);
 
   group3->addButton(r_tonic2, 1);
@@ -90,7 +97,7 @@ InspectorWidget::InspectorWidget(
   r_tonic2->setVisible(false);
   r_qinharm2->setVisible(false);
   r_noise2->setVisible(false);
-  
+
   connect(r_hybrid, SIGNAL(toggled(bool)), r_tonic2, SLOT(setVisible(bool)));
   connect(r_hybrid, SIGNAL(toggled(bool)), r_qinharm2, SLOT(setVisible(bool)));
   connect(r_hybrid, SIGNAL(toggled(bool)), r_noise2, SLOT(setVisible(bool)));
@@ -99,18 +106,19 @@ InspectorWidget::InspectorWidget(
   /* scrolling menu */
   QComboBox *list = new QComboBox;
   lay->addWidget(list);
-  list->addItem("pauvre");
-  list->addItem("riche");
-  list->addItem("hybride");
+  list->addItem("Pauvre");
+  list->addItem("Riche");
+  list->addItem("Hybride");
 
 
   lay->addWidget(new QLabel());
   lay->addWidget(new QLabel());
 
-  QLabel *spectrale = new QLabel;
-  lay->addWidget(spectrale);
-  spectrale->setText("clé mélodique");
-  
+  {
+   // QLabel *spectrale = new QLabel;
+   // lay->addWidget(spectrale);
+   // spectrale->setText("Clef mélodique");
+  }
   /*QPushButton *boutonQuitter = new QPushButton("Bouton");
   lay->addWidget(boutonQuitter);
   QWidget::connect(boutonQuitter,SIGNAL(clicked()),parent,SLOT(quit()));*/

@@ -33,8 +33,8 @@ Model::Model(
 
   // Default SpectralKey
   SpectralKeyData skData;
-  skData.setNature(tonic);
-  skData.setNature2(null);
+  skData.nature = tonic;
+  skData.nature2 = null;
 
   spectralKey.add(new SpectralKey{Id<SpectralKey>{0}, skData , this});
 }
@@ -110,14 +110,14 @@ void Model::setDurationAndShrink(const TimeVal& newDuration) noexcept
 template <>
 void DataStreamReader::read(const Acousmoscribe::SignData& sd)
 {
-  m_stream << sd.m_start << sd.m_duration << sd.m_grain << sd.m_dynamicProfile << sd.m_melodicProfile << sd.m_rhythmicProfile;
+  m_stream << sd.start << sd.duration << sd.grain << sd.dynamicProfile << sd.melodicProfile << sd.rhythmicProfile;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SignData& sd)
 {
-  m_stream >> sd.m_start >> sd.m_duration >> sd.m_grain >> sd.m_dynamicProfile >> sd.m_melodicProfile >> sd.m_rhythmicProfile;
+  m_stream >> sd.start >> sd.duration >> sd.grain >> sd.dynamicProfile >> sd.melodicProfile >> sd.rhythmicProfile;
   checkDelimiter();
 }
 
@@ -125,12 +125,12 @@ template <>
 void JSONReader::read(const Acousmoscribe::SignData& sd)
 {
   stream.StartArray();
-  stream.Double(sd.m_start);
-  stream.Double(sd.m_duration);
-  stream.Int(sd.m_grain);
-  JSONReader::read(sd.m_dynamicProfile);
-  JSONReader::read(sd.m_melodicProfile);
-  JSONReader::read(sd.m_rhythmicProfile);
+  stream.Double(sd.start);
+  stream.Double(sd.duration);
+  stream.Int(sd.grain);
+  JSONReader::read(sd.dynamicProfile);
+  JSONReader::read(sd.melodicProfile);
+  JSONReader::read(sd.rhythmicProfile);
   stream.EndArray();
 }
 
@@ -138,12 +138,12 @@ template <>
 void JSONWriter::write(Acousmoscribe::SignData& sd)
 {
   const auto& arr = base.GetArray();
-  sd.m_start = arr[0].GetDouble();
-  sd.m_duration = arr[1].GetDouble();
-  sd.m_grain = (Acousmoscribe::Grain) arr[2].GetInt();
-  JSONWriter::write(sd.m_dynamicProfile);
-  JSONWriter::write(sd.m_melodicProfile);
-  JSONWriter::write(sd.m_rhythmicProfile);
+  sd.start = arr[0].GetDouble();
+  sd.duration = arr[1].GetDouble();
+  sd.grain = (Acousmoscribe::Grain) arr[2].GetInt();
+  JSONWriter::write(sd.dynamicProfile);
+  JSONWriter::write(sd.melodicProfile);
+  JSONWriter::write(sd.rhythmicProfile);
 }
 
 /*******************************
@@ -282,40 +282,29 @@ void JSONWriter::write(Acousmoscribe::Model& proc)
 template <>
 void DataStreamReader::read(const Acousmoscribe::SpectralKeyData& skd)
 {
-  m_stream << skd.nature() << skd.nature2() << skd.isHybrid() << skd.isHybrid2() << skd.isRich() << skd.isRich2() << skd.isWarped() << skd.isWarped2();
+  m_stream << skd.nature << skd.nature2 << skd.isHybrid << skd.isHybrid2 << skd.isRich << skd.isRich2 << skd.isWarped << skd.isWarped2;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SpectralKeyData& skd)
 {
-    Acousmoscribe::Nature nat;
-    Acousmoscribe::Nature nat2;
-    bool hyb, hyb2, rich, rich2, warp, warp2;
-    m_stream >> nat >> nat2 >> hyb >> hyb2 >> rich >> rich2 >> warp >> warp2;
-    skd.setNature(nat);
-    skd.setNature2(nat2);
-    skd.setIsHybrid(hyb);
-    skd.setIsHybrid2(hyb2);
-    skd.setIsRich(rich);
-    skd.setIsRich2(rich2);
-    skd.setIsWarped(warp);
-    skd.setIsWarped2(warp2);
-    checkDelimiter();
+  m_stream >> skd.nature >> skd.nature2 >> skd.isHybrid >> skd.isHybrid2 >> skd.isRich >> skd.isRich2 >> skd.isWarped >> skd.isWarped2;
+  checkDelimiter();
 }
 
 template <>
 void JSONReader::read(const Acousmoscribe::SpectralKeyData& skd)
 {
   stream.StartArray();
-  stream.Int(skd.nature());
-  stream.Int(skd.nature2());
-  stream.Bool(skd.isHybrid());
-  stream.Bool(skd.isHybrid2());
-  stream.Bool(skd.isRich());
-  stream.Bool(skd.isRich2());
-  stream.Bool(skd.isWarped());
-  stream.Bool(skd.isWarped());
+  stream.Int(skd.nature);
+  stream.Int(skd.nature2);
+  stream.Bool(skd.isHybrid);
+  stream.Bool(skd.isHybrid2);
+  stream.Bool(skd.isRich);
+  stream.Bool(skd.isRich2);
+  stream.Bool(skd.isWarped);
+  stream.Bool(skd.isWarped2);
   stream.EndArray();
 }
 
@@ -323,29 +312,14 @@ template <>
 void JSONWriter::write(Acousmoscribe::SpectralKeyData& skd)
 {
   const auto& arr = base.GetArray();
-  Acousmoscribe::Nature n;
-  switch (arr[0].GetInt())
-  {
-  case 1: n = Acousmoscribe::tonic; break;
-  case 2: n = Acousmoscribe::inharmonic; break;
-  case 3: n = Acousmoscribe::noise; break;
-  default: n = Acousmoscribe::null;
-    break;
-  }
-  skd.setNature(n);
-
-  switch (arr[1].GetInt())
-  {
-  case 1: n = Acousmoscribe::tonic; break;
-  case 2: n = Acousmoscribe::inharmonic; break;
-  case 3: n = Acousmoscribe::noise; break;
-  default: n = Acousmoscribe::null;
-    break;
-  }
-  skd.setNature2(n);
-  skd.setIsHybrid(arr[2].GetBool());
-  skd.setIsRich(arr[3].GetBool());
-  skd.setIsRich2(arr[4].GetBool());
+  skd.nature = static_cast<Acousmoscribe::Nature>(arr[0].GetInt());
+  skd.nature2 = static_cast<Acousmoscribe::Nature>(arr[1].GetInt());
+  skd.isHybrid = static_cast<Acousmoscribe::Nature>(arr[2].GetBool());
+  skd.isHybrid2 = static_cast<Acousmoscribe::Nature>(arr[3].GetBool());
+  skd.isRich = static_cast<Acousmoscribe::Nature>(arr[4].GetBool());
+  skd.isRich2 = static_cast<Acousmoscribe::Nature>(arr[5].GetBool());
+  skd.isWarped = static_cast<Acousmoscribe::Nature>(arr[6].GetBool());
+  skd.isWarped2 = static_cast<Acousmoscribe::Nature>(arr[7].GetBool());
 }
 
 /****************************
@@ -423,18 +397,14 @@ void JSONWriter::write(Acousmoscribe::SpectralKey& sk)
 template <>
 void DataStreamReader::read(const Acousmoscribe::MelodicKeyData& mkd)
 {
-  m_stream << mkd.pitch() << mkd.range();
+  m_stream << mkd.pitch << mkd.range;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::MelodicKeyData& mkd)
 {
-  Acousmoscribe::Pitch p;
-  Acousmoscribe::Range r;
-  m_stream >> p >> r;
-  mkd.setPitch(p);
-  mkd.setRange(r);
+  m_stream >> mkd.pitch >> mkd.range;
   checkDelimiter();
 }
 
@@ -442,8 +412,8 @@ template <>
 void JSONReader::read(const Acousmoscribe::MelodicKeyData& mkd)
 {
   stream.StartArray();
-  stream.Int(mkd.pitch());
-  stream.Int(mkd.range());
+  stream.Int(mkd.pitch);
+  stream.Int(mkd.range);
   stream.EndArray();
 }
 
@@ -451,29 +421,8 @@ template <>
 void JSONWriter::write(Acousmoscribe::MelodicKeyData& mkd)
 {
   const auto& arr = base.GetArray();
-  Acousmoscribe::Pitch p;
-  switch (arr[0].GetInt())
-  {
-  case 1: p = Acousmoscribe::high; break;
-  case 2: p = Acousmoscribe::mid_high; break;
-  case 3: p = Acousmoscribe::mid; break;
-  case 4: p = Acousmoscribe::mid_low; break;
-  case 5: p = Acousmoscribe::low; break;
-  case 6: p = Acousmoscribe::very_low; break;
-  default: p = Acousmoscribe::very_high;
-    break;
-  }
-  mkd.setPitch(p);
-
-  Acousmoscribe::Range r;
-  switch (arr[1].GetInt())
-  {
-  case 1: r = Acousmoscribe::normal; break;
-  case 2: r = Acousmoscribe::strong; break;
-  default: r = Acousmoscribe::weak;
-    break;
-  }
-  mkd.setRange(r);
+  mkd.pitch = static_cast<Acousmoscribe::Pitch>(arr[0].GetInt());
+  mkd.range = static_cast<Acousmoscribe::Range>(arr[1].GetInt());
 }
 
 /****************************
@@ -491,7 +440,7 @@ void DataStreamWriter::write(Acousmoscribe::MelodicKey& mk)
 {
   Acousmoscribe::MelodicKeyData mkd;
   m_stream >> mkd;
-  mk.setData(mkd);
+  mk.setMelodicKeyData(mkd);
   checkDelimiter();
 }
 
@@ -509,27 +458,6 @@ template <>
 void JSONWriter::write(Acousmoscribe::MelodicKey& mk)
 {
   const auto& arr = obj["MelodicKey"].toArray();
-  Acousmoscribe::Pitch p;
-  switch (arr[0].GetInt())
-  {
-  case 1: p = Acousmoscribe::high; break;
-  case 2: p = Acousmoscribe::mid_high; break;
-  case 3: p = Acousmoscribe::mid; break;
-  case 4: p = Acousmoscribe::mid_low; break;
-  case 5: p = Acousmoscribe::low; break;
-  case 6: p = Acousmoscribe::very_low; break;
-  default: p = Acousmoscribe::very_high;
-    break;
-  }
-  mk.setPitch(p);
-
-  Acousmoscribe::Range r;
-  switch (arr[1].GetInt())
-  {
-  case 1: r = Acousmoscribe::normal; break;
-  case 2: r = Acousmoscribe::strong; break;
-  default: r = Acousmoscribe::weak;
-    break;
-  }
-  mk.setRange(r);
+  mk.setPitch(static_cast<Acousmoscribe::Pitch>(arr[0].GetInt()));
+  mk.setRange(static_cast<Acousmoscribe::Range>(arr[1].GetInt()));
 }
