@@ -12,6 +12,7 @@
 
 
 #include <score/command/Dispatchers/SingleOngoingCommandDispatcher.hpp>
+#include <score/command/Dispatchers/CommandDispatcher.hpp>
 
 #include <nano_observer.hpp>
 
@@ -120,6 +121,8 @@ private:
 
   /* COMMAND DISPATCHERS */
   SingleOngoingCommandDispatcher<MoveSigns> m_moveDispatcher;
+  CommandDispatcher<> m_disp;
+
 
   std::optional<double> m_origMoveStart{};
 

@@ -30,6 +30,8 @@ enum Nature
     bool isRich2{false};
     bool isWarped{false};
     bool isWarped2{false};
+
+    bool operator==(const SpectralKeyData& other) const noexcept = default;
 };
 
 class SpectralKey final : public IdentifiedObject<SpectralKey>
@@ -59,8 +61,6 @@ public:
     bool isWarped() const noexcept;
     bool isWarped2() const noexcept;
 
-    SpectralKeyData spectralKeyData() const;
-
     void setNature(Nature nature);
     void setNature2(Nature nature2);
     void setIsHybrid(bool isHybrid);
@@ -70,18 +70,12 @@ public:
     void setIsWarped(bool isWarped);
     void setIsWarped2(bool isWarped2);
 
+    SpectralKeyData spectralKeyData() const;
     void setData(SpectralKeyData sd);
-
     void spectralKeyChanged() W_SIGNAL(spectralKeyChanged);
+    PROPERTY(SpectralKeyData, spectralKey READ spectralKeyData WRITE setData NOTIFY spectralKeyChanged)
 private:
-    Nature m_nature{};
-    Nature m_nature2{};
-    bool m_isHybrid{false};
-    bool m_isHybrid2{false};
-    bool m_isRich{false};
-    bool m_isRich2{false};
-    bool m_isWarped{false};
-    bool m_isWarped2{false};
+    SpectralKeyData m_impl;
 };
 
 }

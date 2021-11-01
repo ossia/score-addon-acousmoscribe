@@ -70,3 +70,68 @@ void MelodicKey::setRange(Range range) {
 
 
 }
+
+template <>
+void DataStreamReader::read(const Acousmoscribe::MelodicKeyData& mkd)
+{
+  m_stream << mkd.pitch << mkd.range;
+  insertDelimiter();
+}
+
+template <>
+void DataStreamWriter::write(Acousmoscribe::MelodicKeyData& mkd)
+{
+  m_stream >> mkd.pitch >> mkd.range;
+  checkDelimiter();
+}
+
+template <>
+void JSONReader::read(const Acousmoscribe::MelodicKeyData& mkd)
+{
+  stream.StartArray();
+  stream.Int(mkd.pitch);
+  stream.Int(mkd.range);
+  stream.EndArray();
+}
+
+template <>
+void JSONWriter::write(Acousmoscribe::MelodicKeyData& mkd)
+{
+  const auto& arr = base.GetArray();
+  mkd.pitch = static_cast<Acousmoscribe::Pitch>(arr[0].GetInt());
+  mkd.range = static_cast<Acousmoscribe::Range>(arr[1].GetInt());
+}
+
+template <>
+void DataStreamReader::read(const Acousmoscribe::MelodicKey& mk)
+{
+  m_stream << mk.melodicKeyData();
+  insertDelimiter();
+}
+
+template <>
+void DataStreamWriter::write(Acousmoscribe::MelodicKey& mk)
+{
+  Acousmoscribe::MelodicKeyData mkd;
+  m_stream >> mkd;
+  mk.setMelodicKeyData(mkd);
+  checkDelimiter();
+}
+
+template <>
+void JSONReader::read(const Acousmoscribe::MelodicKey& mk)
+{
+  stream.Key("MelodicKey");
+  stream.StartArray();
+  stream.Int(mk.pitch());
+  stream.Int(mk.range());
+  stream.EndArray();
+}
+
+template <>
+void JSONWriter::write(Acousmoscribe::MelodicKey& mk)
+{
+  const auto& arr = obj["MelodicKey"].toArray();
+  mk.setPitch(static_cast<Acousmoscribe::Pitch>(arr[0].GetInt()));
+  mk.setRange(static_cast<Acousmoscribe::Range>(arr[1].GetInt()));
+}

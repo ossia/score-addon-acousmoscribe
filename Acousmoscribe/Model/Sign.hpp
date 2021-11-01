@@ -52,47 +52,27 @@ public:
     }
 
     double start() const noexcept;
-
     double duration() const noexcept;
-
     double end() const noexcept;
-
     DynamicProfile dynamicProfile() const;
-
     MelodicProfile melodicProfile() const;
-
     RhythmicProfile rhythmicProfile() const;
-
     Grain grain() const;
 
-    SignData signData() const;
-
     void scale(double s) noexcept;
-
     void setStart(double s) noexcept;
-
     void setDuration(double s) noexcept;
-
     void setDynamicProfile(DynamicProfile d);
-
     void setMelodicProfile(MelodicProfile d);
-
     void setRhythmicProfile(RhythmicProfile d);
-
     void setGrain(Grain g);
 
     void setData(SignData d);
-
-public:
+    SignData signData() const;
     void signChanged() W_SIGNAL(signChanged);
-
+    PROPERTY(SignData, signData READ signData WRITE setData NOTIFY signChanged)
 
 private:
-    double m_start{};
-    double m_duration{};
-    Grain _grain{smooth};
-    DynamicProfile _dynamicProfile{};
-    MelodicProfile _melodicProfile{};
-    RhythmicProfile _rhythmicProfile{};
+    SignData m_impl;
 };
 }
