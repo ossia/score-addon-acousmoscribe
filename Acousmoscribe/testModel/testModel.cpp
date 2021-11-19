@@ -61,7 +61,7 @@ public:
     MelodicProfile mp = MelodicProfile(mid,none);
     RhythmicProfile rp = RhythmicProfile();
 
-    SignData c = SignData(10,10,g,d,mp,rp); 
+    SignData c = SignData(10,10,g,d,mp,rp);
 
 
     Sign sign = Sign();
@@ -71,7 +71,7 @@ public:
 
 SCENARIO ("Creation of equal Sign and change on second", "[Sign][Creation][Modifiaction]")
 {
-    GIVEN("Creation of two equal sign") 
+    GIVEN("Creation of two equal sign")
     {
         /**
          * First time we create a sign data
@@ -80,10 +80,10 @@ SCENARIO ("Creation of equal Sign and change on second", "[Sign][Creation][Modif
         DynamicProfile d;
         d.volumeEnd = 1;
         d.volumeStart = 0.5;
-        MelodicProfile mp = MelodicProfile(mid,mid,none);
+        MelodicProfile mp = MelodicProfile{mid,mid,none};
         RhythmicProfile rp = RhythmicProfile();
 
-        SignData initSignData = SignData(10,10,g,d,mp,rp); 
+        SignData initSignData = SignData{10,10,g,d,mp,rp};
 
         /**
          * Model Inititalisation
@@ -92,7 +92,7 @@ SCENARIO ("Creation of equal Sign and change on second", "[Sign][Creation][Modif
 
         QObject q = QObject(0);
         Id<Sign> id = Id<Sign>();
-        
+
         /**
          * Creation of sign
          **/
@@ -136,10 +136,10 @@ SCENARIO("Creation of sign, mutiple Modification", "[Sign][Dynamic][Rhythmic][Me
         DynamicProfile d;
         d.volumeEnd = 1;
         d.volumeStart = 0.5;
-        MelodicProfile mp = MelodicProfile(mid,mid,none);
-        RhythmicProfile rp = RhythmicProfile(continuous, constant, false);
+        MelodicProfile mp = MelodicProfile{mid,mid,none};
+        RhythmicProfile rp = RhythmicProfile{continuous, constant, false};
 
-        SignData initSignData = SignData(10,10,g,d,mp,rp); 
+        SignData initSignData = SignData{10,10,g,d,mp,rp};
 
         QObject q = QObject(0);
         Id<Sign> id = Id<Sign>();
@@ -149,12 +149,12 @@ SCENARIO("Creation of sign, mutiple Modification", "[Sign][Dynamic][Rhythmic][Me
 
         THEN("Verification that setData Work correctly")
         {
-            REQUIRE(sign.duration() == initSignData.duration());
-            REQUIRE(sign.start() == initSignData.start());
-            REQUIRE(sign.grain() == initSignData.grain());
-            REQUIRE(sign.dynamicProfile() == initSignData.dynamicProfile());
-            REQUIRE(sign.melodicProfile() == initSignData.melodicProfile());
-            REQUIRE(sign.rhythmicProfile() == initSignData.rhythmicProfile());
+            REQUIRE(sign.duration() == initSignData.duration);
+            REQUIRE(sign.start() == initSignData.start);
+            REQUIRE(sign.grain() == initSignData.grain);
+            REQUIRE(sign.dynamicProfile() == initSignData.dynamicProfile);
+            REQUIRE(sign.melodicProfile() == initSignData.melodicProfile);
+            REQUIRE(sign.rhythmicProfile() == initSignData.rhythmicProfile);
         }
 
         WHEN("change start")
@@ -196,7 +196,7 @@ SCENARIO("Creation of sign, mutiple Modification", "[Sign][Dynamic][Rhythmic][Me
 
         WHEN("change melodic profile")
         {
-            MelodicProfile mp = MelodicProfile(high,high,random_variation);
+            MelodicProfile mp = MelodicProfile{high,high,random_variation};
 
             sign.setMelodicProfile(mp);
 
@@ -210,7 +210,7 @@ SCENARIO("Creation of sign, mutiple Modification", "[Sign][Dynamic][Rhythmic][Me
 
         WHEN("change rhythmic profile")
         {
-            RhythmicProfile rp = RhythmicProfile(slow, accelerating, true);
+            RhythmicProfile rp = RhythmicProfile{slow, accelerating, true};
 
             sign.setRhythmicProfile(rp);
 
@@ -228,10 +228,10 @@ SCENARIO("Creation of Spectral Key", "[SpectralKey]")
     GIVEN("Creation of Spectral Key")
     {
         /**
-         * Creation of Spectral Key Data 
+         * Creation of Spectral Key Data
          **/
 
-        SpectralKeyData initSpectralKeyData = SpectralKeyData(tonic,tonic,false,false,false,false,false,false); 
+        SpectralKeyData initSpectralKeyData = SpectralKeyData{tonic,tonic,false,false,false,false,false,false};
 
         /**
          * Model Inititalisation
@@ -240,7 +240,7 @@ SCENARIO("Creation of Spectral Key", "[SpectralKey]")
 
         QObject q = QObject(0);
         Id<SpectralKey> id = Id<SpectralKey>();
-        
+
         /**
          * Creation of Spectral Key
          **/
@@ -300,7 +300,7 @@ SCENARIO("Creation of Spectral Key", "[SpectralKey]")
             }
         }
 
-        
+
     }
 }
 
@@ -310,11 +310,11 @@ SCENARIO("Test on Melodic Key", "[MelodicKey]")
     {
         TestModel* m_model;
 
-        MelodicKeyData mkd = MelodicKeyData(mid, normal);
+        MelodicKeyData mkd = MelodicKeyData{mid, normal};
 
         QObject q = QObject(0);
         Id<MelodicKey> id = Id<MelodicKey>();
-    
+
         MelodicKey mp1 = MelodicKey(id,mkd,&q);
         MelodicKey mp2 = MelodicKey(id,mkd,&q);
 
@@ -367,6 +367,6 @@ SCENARIO("Test on Melodic Key", "[MelodicKey]")
     Presenter p_pres = Presenter(m_model->model, &v,ctx,&q);
 
      CommandDispatcher<>{context().context.commandStack}.submit(
-        new AddMelodicKey{m_model, mkData}); 
+        new AddMelodicKey{m_model, mkData});
 
  }*/

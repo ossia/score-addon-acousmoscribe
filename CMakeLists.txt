@@ -80,10 +80,6 @@ set(SRCS
     score_addon_acousmoscribe.cpp
 )
 
-
-
-find_package(Catch2 REQUIRED)
-
 # Creation of the library
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
 # Code generation
@@ -91,6 +87,7 @@ score_generate_command_list_file(${PROJECT_NAME} "${HDRS}")
 setup_score_plugin(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC score_plugin_engine)
 
+find_package(Catch2)
 if(TARGET Catch2::Catch2WithMain)
   add_executable(testModel Acousmoscribe/testModel/testModel.cpp)
   target_compile_options(testModel PUBLIC -std=c++17)
