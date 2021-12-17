@@ -94,16 +94,19 @@ Presenter::Presenter(
     }
   });*/
 
-  model.melodicKeys.added.connect<&Presenter::on_melodicKeyAdded>(this);
-  model.spectralKey.added.connect<&Presenter::on_spectralKeyAdded>(this);
+  {
+    m_melodicKeyView = new MelodicKeyView{*model.melodicKey, *this, m_view};
+    updateMelodicKey(*m_melodicKeyView);
+  }
+
+  {
+    m_spectralKeyView = new SpectralKeyView{*model.spectralKey, *this, m_view};
+    updateSpectralKey(*m_spectralKeyView);
+  }
 
   model.signs.added.connect<&Presenter::on_signAdded>(this);
   model.signs.removing.connect<&Presenter::on_signRemoving>(this);
 
-  for(auto& k : model.melodicKeys)
-    on_melodicKeyAdded(k);
-  for(auto& k : model.spectralKey)
-    on_spectralKeyAdded(k);
   for (auto& sign : model.signs)
     on_signAdded(sign);
 
@@ -465,20 +468,6 @@ void Presenter::on_signGrainChanged(const Sign& sign, Grain g)
 }
 
 // =================================================================================================================
-
-void Presenter::on_melodicKeyAdded(const MelodicKey& mKey)
-{
-  auto v = new MelodicKeyView{mKey, *this, m_view};
-  updateMelodicKey(*v);
-  m_melodicKeyView = v;
-}
-
-void Presenter::on_spectralKeyAdded(const SpectralKey& mKey)
-{
-  auto v = new SpectralKeyView{mKey, *this, m_view};
-  updateSpectralKey(*v);
-  m_spectralKeyView = v;
-}
 
 
 void Presenter::on_signAdded(const Sign& s)

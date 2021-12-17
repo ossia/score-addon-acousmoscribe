@@ -30,8 +30,8 @@ public:
   ~Model() override;
 
   score::EntityMap<Sign> signs;
-  score::EntityMap<SpectralKey> spectralKey;
-  score::EntityMap<MelodicKey> melodicKeys;
+  std::unique_ptr<SpectralKey> spectralKey;
+  std::unique_ptr<MelodicKey> melodicKey;
 
 public:
   void signsNeedUpdate() W_SIGNAL(signsNeedUpdate);

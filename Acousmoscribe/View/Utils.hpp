@@ -32,7 +32,10 @@ QFont buttonFont(double button_w, double button_h)
 
   double factor = std::min(w_of_a_button, h_of_a_button);
 
-  return QFont("Sans", 0.3 * factor, QFont::Bold);
+  QFont f("Sans");
+  f.setPointSizeF(0.3 * factor);
+  f.setWeight(QFont::Bold);
+  return f;
 }
 
 inline

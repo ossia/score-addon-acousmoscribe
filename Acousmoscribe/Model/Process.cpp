@@ -29,14 +29,14 @@ Model::Model(
   // Default MelodicKey
   MelodicKeyData mkData = {mid, weak};
 
-  melodicKeys.add(new MelodicKey{Id<MelodicKey>{0}, mkData , this});
+  melodicKey.reset(new MelodicKey{Id<MelodicKey>{0}, mkData , this});
 
   // Default SpectralKey
   SpectralKeyData skData;
   skData.nature = tonic;
   skData.nature2 = null;
 
-  spectralKey.add(new SpectralKey{Id<SpectralKey>{0}, skData , this});
+  spectralKey.reset(new SpectralKey{Id<SpectralKey>{0}, skData , this});
 }
 
 Model::~Model()
@@ -112,23 +112,12 @@ void DataStreamReader::read(const Acousmoscribe::Model& proc)
 {
   m_stream << (int32_t)proc.signs.size();
 
+  readFrom(*proc.spectralKey);
+  readFrom(*proc.melodicKey);
+
   for (const auto& sign : proc.signs)
   {
     readFrom(sign);
-  }
-
-  m_stream << (int32_t)proc.spectralKey.size();
-
-  for (const auto& speck : proc.spectralKey)
-  {
-    readFrom(speck);
-  }
-
-  m_stream << (int32_t)proc.melodicKeys.size();
-
-  for (const auto& melok : proc.melodicKeys)
-  {
-    readFrom(melok);
   }
 
   insertDelimiter();
@@ -140,20 +129,11 @@ void DataStreamWriter::write(Acousmoscribe::Model& proc)
   int32_t sign_count;
   m_stream >> sign_count;
 
+  proc.spectralKey.reset(new Acousmoscribe::SpectralKey{*this, &proc});
+  proc.melodicKey.reset(new Acousmoscribe::MelodicKey{*this, &proc});
+
   for(; sign_count-- > 0;)
     proc.signs.add(new Acousmoscribe::Sign{*this, &proc});
-
-  int32_t speck_count;
-  m_stream >> speck_count;
-
-  for(; speck_count-- >0;)
-    proc.spectralKey.add(new Acousmoscribe::SpectralKey{*this, &proc});
-
-  int32_t melok_count;
-  m_stream >> melok_count;
-
-  for(; melok_count-- >0;)
-    proc.melodicKeys.add(new Acousmoscribe::MelodicKey{*this, &proc});
 
   checkDelimiter();
 }
@@ -162,20 +142,20 @@ template <>
 void JSONReader::read(const Acousmoscribe::Model& proc)
 {
   obj["Signs"] = proc.signs;
-  obj["MelodicKeys"] = proc.melodicKeys;
-  obj["SpectralKeys"] = proc.spectralKey;
+  obj["MelodicKey"] = *proc.melodicKey;
+  obj["SpectralKey"] = *proc.spectralKey;
 }
 
 template <>
 void JSONWriter::write(Acousmoscribe::Model& proc)
 {
-  for(const auto& json_vref : obj["MelodicKeys"].toArray()){
-    JSONObject::Deserializer deserializer{json_vref};
-    proc.melodicKeys.add(new Acousmoscribe::MelodicKey{deserializer, &proc});
+  {
+    JSONObject::Deserializer deserializer{obj["MelodicKey"]};
+    proc.melodicKey.reset(new Acousmoscribe::MelodicKey{deserializer, &proc});
   }
-  for(const auto& json_vref : obj["SpectralKeys"].toArray()){
-    JSONObject::Deserializer deserializer{json_vref};
-    proc.spectralKey.add(new Acousmoscribe::SpectralKey{deserializer, &proc});
+  {
+    JSONObject::Deserializer deserializer{obj["SpectralKey"]};
+    proc.spectralKey.reset(new Acousmoscribe::SpectralKey{deserializer, &proc});
   }
   for(const auto& json_vref : obj["Signs"].toArray()){
     JSONObject::Deserializer deserializer{json_vref};
