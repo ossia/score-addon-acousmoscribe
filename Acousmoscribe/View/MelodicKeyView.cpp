@@ -6,6 +6,7 @@
 
 #include <Acousmoscribe/Model/MelodicKey.hpp>
 #include <Acousmoscribe/Presenter/Presenter.hpp>
+#include <Acousmoscribe/View/Utils.hpp>
 
 namespace Acousmoscribe
 {
@@ -25,22 +26,22 @@ MelodicKeyView::MelodicKeyView(const MelodicKey& mk, Presenter& p, View* parent)
 void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
   painter->setRenderHint(QPainter::Antialiasing, true);
-  float w = m_width;
-  float h = m_height*0.99;
+
+  const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
 
   Pitch pitch = melodicKey.pitch();
   Range range = melodicKey.range();
 
   QPen pen;
   pen.setWidth(2);
-  pen.setColor(Qt::black);
+  pen.setColor(drawColor);
   pen.setStyle(Qt::SolidLine);
   painter->setPen(pen);
 
   /* Background Rect */
 
-  painter->setBrush(Qt::white);
-  painter->drawRect(boundingRect().adjusted(0., 0., 0., 0));
+  painter->setBrush(fillColor);
+  //painter->drawRect(x0, y0, w, h);
 
   float h_pitch = h*4/5;
   float x_pitch = w * 1/4;
@@ -92,9 +93,9 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
     QRectF r1 = pitchButtonRect();
     if(r1.contains(*m_mousePos))
-      pen.setColor(Qt::blue);
+      pen.setColor(focusColor);
     else
-      pen.setColor(Qt::black);
+      pen.setColor(drawColor);
     painter->setPen(pen);
     painter->drawRect(r1);
     painter->drawText(r1, "PITCH", QTextOption(Qt::AlignCenter));
@@ -102,9 +103,9 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
     QRectF r2 = rangeButtonRect();
     if(r2.contains(*m_mousePos))
-      pen.setColor(Qt::blue);
+      pen.setColor(focusColor);
     else
-      pen.setColor(Qt::black);
+      pen.setColor(drawColor);
     painter->setPen(pen);
     painter->drawRect(r2);
     painter->drawText(r2, "RANGE", QTextOption(Qt::AlignCenter));
@@ -113,20 +114,19 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 }
 
+
 QRectF MelodicKeyView::pitchButtonRect() const noexcept
 {
-  float w = m_width;
-  float h = m_height*0.99;
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{0, 0.85 * h, w / 2, 0.15 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0, y0, w / 2, h}.adjusted(border, border, -border, -border);
 }
 
 QRectF MelodicKeyView::rangeButtonRect() const noexcept
 {
-  float w = m_width;
-  float h = m_height*0.99;
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{w / 2, 0.85 * h, w / 2, 0.15 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + w / 2, y0, w / 2, h}.adjusted(border, border, -border, -border);
 }
 
 QRectF MelodicKeyView::computeRect() const noexcept

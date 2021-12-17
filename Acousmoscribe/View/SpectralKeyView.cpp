@@ -10,6 +10,7 @@
 #include <Acousmoscribe/Presenter/Presenter.hpp>
 #include <Acousmoscribe/View/SpectralKeyView.hpp>
 #include <Acousmoscribe/View/View.hpp>
+#include <Acousmoscribe/View/Utils.hpp>
 
 namespace Acousmoscribe
 {
@@ -28,8 +29,8 @@ void SpectralKeyView::paint(
     QWidget* widget)
 {
   painter->setRenderHint(QPainter::Antialiasing, true);
-  float w = m_width;
-  float h = m_height*0.99;
+
+  const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
 
   Nature nature = spectralKey.nature();
   Nature nature2 = spectralKey.nature2();
@@ -41,14 +42,14 @@ void SpectralKeyView::paint(
   bool warped2 = spectralKey.isWarped2();
 
   QPen p;
-  p.setColor(Qt::black);
+  p.setColor(drawColor);
   p.setWidth(2);
   painter->setPen(p);
 
   /* Background Rect */
 
-  painter->setBrush(Qt::white);
-  painter->drawRect(boundingRect().adjusted(0., 0., 0., 0));
+  // painter->setBrush(Qt::white);
+  // painter->drawRect(x0, y0, w, h);
 
 
   if (hybrid)
@@ -212,6 +213,31 @@ void SpectralKeyView::paint(
     }
   }
 
+  if(m_mousePos)
+  {
+    p.setStyle(Qt::SolidLine);
+    painter->setFont(QFont("Sans", 7, QFont::Bold));
+
+    for(auto [r1, text] : {
+        std::make_pair(changeNatureButtonRect(), "N"),
+        std::make_pair(changeNature2ButtonRect(), "N2"),
+        std::make_pair(changeRichButtonRect(), "R"),
+        std::make_pair(changeRich2ButtonRect(), "R2"),
+        std::make_pair(changeHybridButtonRect(), "H"),
+        std::make_pair(changeHybrid2ButtonRect(), "H2"),
+        std::make_pair(changeWarpedButtonRect(), "W"),
+        std::make_pair(changeWarped2ButtonRect(), "W2"),
+      })
+    {
+      if(r1.contains(*m_mousePos))
+        p.setColor(focusColor);
+      else
+        p.setColor(drawColor);
+      painter->setPen(p);
+      painter->drawRect(r1);
+      painter->drawText(r1, text, QTextOption(Qt::AlignCenter));
+    }
+  }
   painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
@@ -234,6 +260,64 @@ bool SpectralKeyView::canEdit() const
   return boundingRect().height() > 5;
 }
 
+QRectF SpectralKeyView::changeNatureButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 0, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeNature2ButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 0, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeRichButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeRich2ButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeHybridButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 2 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeHybrid2ButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 2 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+
+QRectF SpectralKeyView::changeWarpedButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeWarped2ButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+
 void SpectralKeyView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
   const auto mods = QGuiApplication::keyboardModifiers();
@@ -247,50 +331,23 @@ void SpectralKeyView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
   if (canEdit())
   {
-    if (event->pos().x() <= w/2 && event->pos().y() >= h / 2)
-    {
-      if (mods & Qt::AltModifier)
-      {
-        m_action = ChangeNature2;
-      }
-      else{
-        m_action = ChangeNature;
-      }
-    }
-    else if (event->pos().x() <= w/2 && event->pos().y() <= h / 2)
-    {
-      if (mods & Qt::AltModifier)
-      {
-        m_action = ChangeRich2;
-      }
-      else{
-        m_action = ChangeRich;
-      }
-    }
-    else if (event->pos().x() >= w/2 && event->pos().y() <= h / 2)
-    {
-      if (mods & Qt::AltModifier)
-      {
-        m_action = ChangeHybrid2;
-      }
-      else{
-        m_action = ChangeHybrid;
-      }
-    }
-    else if (event->pos().x() >= w/2 && event->pos().y() >= h / 2)
-    {
-      if (mods & Qt::AltModifier)
-      {
-        m_action = ChangeWarped2;
-      }
-      else{
-        m_action = ChangeWarped;
-      }
-    }
-    else
-    {
-      m_action = None;
-    }
+    const auto pos = event->pos();
+    if(changeNatureButtonRect().contains(pos))
+      m_action = ChangeNature;
+    else if(changeNature2ButtonRect().contains(pos))
+      m_action = ChangeNature2;
+    else if(changeRichButtonRect().contains(pos))
+      m_action = ChangeRich;
+    else if(changeRich2ButtonRect().contains(pos))
+      m_action = ChangeRich2;
+    else if(changeHybridButtonRect().contains(pos))
+      m_action = ChangeHybrid;
+    else if(changeHybrid2ButtonRect().contains(pos))
+      m_action = ChangeHybrid2;
+    else if(changeWarpedButtonRect().contains(pos))
+      m_action = ChangeWarped;
+    else if(changeWarped2ButtonRect().contains(pos))
+      m_action = ChangeWarped2;
   }
   event->accept();
 }
@@ -362,5 +419,23 @@ SpectralKeyView::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
   }
 
   return QGraphicsItem::itemChange(change, value);
+}
+
+void SpectralKeyView::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = event->pos();
+  update();
+}
+
+void SpectralKeyView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = event->pos();
+  update();
+}
+
+void SpectralKeyView::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = std::nullopt;
+  update();
 }
 }

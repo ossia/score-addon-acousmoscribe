@@ -9,7 +9,7 @@ namespace Acousmoscribe
 class View;
 class Presenter;
 class Sign;
-class SignView final 
+class SignView final
     : public QGraphicsItem
 {
   Q_INTERFACES(QGraphicsItem)
@@ -56,6 +56,7 @@ private:
 
   float m_width{};
   float m_height{};
+  std::optional<QPointF> m_mousePos;
 
   enum Action {
     None,

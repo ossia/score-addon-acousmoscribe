@@ -20,7 +20,8 @@
 W_OBJECT_IMPL(Acousmoscribe::View)
 namespace Acousmoscribe
 {
-View::View(QGraphicsItem* parent) : Process::LayerView{parent}
+View::View(QGraphicsItem* parent)
+  : Process::LayerView{parent}
 {
   this->setAcceptHoverEvents(true);
   this->setAcceptDrops(true);
@@ -28,8 +29,6 @@ View::View(QGraphicsItem* parent) : Process::LayerView{parent}
   this->setFlag(QGraphicsItem::ItemClipsToShape, true);
 
   m_fragmentCache.reserve(20);
-
-
 }
 
 View::~View()
@@ -43,11 +42,15 @@ void View::paint_impl(QPainter* p) const
 
 void View::mousePressEvent(QGraphicsSceneMouseEvent* ev)
 {
+  const auto& children = childItems();
+  for (auto cld : children)
+    cld->setSelected(false);
+  ev->accept();
 }
 
 void View::mouseReleaseEvent(QGraphicsSceneMouseEvent* ev)
 {
-
+  ev->accept();
 }
 
 void View::setDefaultWidth(double w)
@@ -61,7 +64,6 @@ void View::setDefaultWidth(double w)
 
 void View::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* ev)
 {
-  std::cout << "mouseDoubleClickEvent\n";
   doubleClicked(ev->pos());
   ev->accept();
 }

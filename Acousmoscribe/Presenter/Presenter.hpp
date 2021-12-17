@@ -72,29 +72,31 @@ public:
 
 
 
-  void on_deselectOtherSigns();                         //done
+  void on_deselectOtherSigns();
   void on_signDuplicate();
-  void on_signScaled(const Sign&, double newScale);     //done
-  void on_signMoved(SignView& s);                       //done
-  void on_signMoveFinished(SignView& s);                //done
+  void on_signScaled(const Sign&, double newScale);
+  void on_signMoved(SignView& s);
+  void on_signMoveFinished(SignView& s);
 
   // Dynamic Profile :
-  void on_signVolumeStartChanged(const Sign&, float newVolStart);        //done
-  void on_signVolumeEndChanged(const Sign&, float newVolEnd);            //done
+  void on_signVolumeStartChanged(const Sign&, float newVolStart);
+  void on_signVolumeEndChanged(const Sign&, float newVolEnd);
   //void on_signVolumeChanged(const Sign&, double newVol);
 
   // Other profiles
   //void on_signMelodicProfileChanged(Sign& v, MelodicProfile mp);
-  void on_signMelodicProfilePitchChanged(const Sign&, Pitch newPitch);                //done
-  void on_signMelodicProfilePitchEndChanged(const Sign&, Pitch newPitchEnd);          //done
-  void on_signMelodicProfileVariationChanged(const Sign&, Variation newVar);          //done
+  void on_signMelodicProfilePitchChanged(const Sign&, Pitch newPitch);
+  void on_signMelodicProfilePitchEndChanged(const Sign&, Pitch newPitchEnd);
+  void on_signMelodicProfileVariationChanged(const Sign&, Variation newVar);
 
   //void on_signRhythmicProfileChanged(Sign& v, RhythmicProfile rp);
-  void on_signRhythmicProfileSpeedChanged(const Sign&, Speed newSpeed);               //done
-  void on_signRhythmicProfileAccelerationChanged(const Sign&, Acceleration newAcc);   //done
-  void on_signRhythmicProfileIsRandomChanged(const Sign&, bool newIsRandom);          //done
+  void on_signRhythmicProfileSpeedChanged(const Sign&, Speed newSpeed);
+  void on_signRhythmicProfileAccelerationChanged(const Sign&, Acceleration newAcc);
+  void on_signRhythmicProfileIsRandomChanged(const Sign&, bool newIsRandom);
 
-  void on_signGrainChanged(const Sign&, Grain g);                                     //done
+  void on_signGrainChanged(const Sign&, Grain g);
+
+  void on_selectionChanged(SignView*, bool ok);
 
 
 private:
@@ -118,6 +120,7 @@ private:
   MelodicKeyView* m_melodicKeyView{};
   SpectralKeyView* m_spectralKeyView{};
   std::vector<SignView*> m_signs;
+  std::vector<SignView*> m_selectedSigns;
 
   /* COMMAND DISPATCHERS */
   SingleOngoingCommandDispatcher<MoveSigns> m_moveDispatcher;

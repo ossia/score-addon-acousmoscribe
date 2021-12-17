@@ -47,13 +47,28 @@ private:
   bool canEdit() const;
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-  
+
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+  void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
   QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
   Presenter& m_presenter;
 
+
+  QRectF changeNatureButtonRect() const noexcept;
+  QRectF changeNature2ButtonRect() const noexcept;
+  QRectF changeRichButtonRect() const noexcept;
+  QRectF changeRich2ButtonRect() const noexcept;
+  QRectF changeHybridButtonRect() const noexcept;
+  QRectF changeHybrid2ButtonRect() const noexcept;
+  QRectF changeWarpedButtonRect() const noexcept;
+  QRectF changeWarped2ButtonRect() const noexcept;
+
   float m_width{};
   float m_height{};
+  std::optional<QPointF> m_mousePos;
 
   enum Action {
     None,

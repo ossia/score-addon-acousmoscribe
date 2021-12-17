@@ -142,6 +142,21 @@ Presenter::~Presenter()
 }
 
 
+
+void Presenter::on_selectionChanged(SignView* v, bool ok)
+{
+ if(ok)
+   m_selectedSigns.push_back(v);
+ else
+   ossia::remove_erase(m_selectedSigns, v);
+
+ Selection s;
+ for(auto n : m_selectedSigns)
+   s.append(&n->sign);
+
+ context().context.selectionStack.pushNewSelection(s);
+}
+
 void Presenter::setWidth(qreal val, qreal defaultWidth)
 {
   m_view->setWidth(val);
@@ -475,11 +490,21 @@ void Presenter::on_signAdded(const Sign& s)
 
 void Presenter::on_signRemoving(const Sign& s)
 {
-  auto it = ossia::find_if(m_signs, [&](const auto& other) { return &other->sign == &s; });
-  if (it != m_signs.end())
   {
-    delete *it;
-    m_signs.erase(it);
+    auto it = ossia::find_if(m_selectedSigns, [&](const auto& other) { return &other->sign == &s; });
+    if (it != m_selectedSigns.end())
+    {
+      m_selectedSigns.erase(it);
+    }
+  }
+
+  {
+    auto it = ossia::find_if(m_signs, [&](const auto& other) { return &other->sign == &s; });
+    if (it != m_signs.end())
+    {
+      delete *it;
+      m_signs.erase(it);
+    }
   }
 }
 

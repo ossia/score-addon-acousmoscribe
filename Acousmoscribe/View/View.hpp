@@ -11,6 +11,7 @@ namespace Acousmoscribe
 {
 class SpectralKeyView;
 class MelodicKeyView;
+class Presenter;
 class View final : public Process::LayerView
 {
     W_OBJECT(View)
@@ -21,7 +22,7 @@ public:
   void setDefaultWidth(double w);
   void deleteRequested() W_SIGNAL(deleteRequested);
 
-  
+
   SignData signAtPos(QPointF point) const;
 
 private:
@@ -39,7 +40,7 @@ private:
   MelodicKeyView *m_melodickey;
 
   QPainterPath m_selectArea;
-  double m_defaultW; // Covers the [ 0; 1 ] area
+  double m_defaultW{}; // Covers the [ 0; 1 ] area
 
   QPixmap m_textCache;
   QPixmap m_bgCache;
