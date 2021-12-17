@@ -25,6 +25,8 @@
 #include <Acousmoscribe/Model/RhythmicProfile.hpp>
 #include <Acousmoscribe/Model/MelodicProfile.hpp>
 
+#include <Scenario/Document/ScenarioDocument/ScenarioDocumentView.hpp>
+
 #include <ossia/detail/algorithms.hpp>
 #include <ossia/detail/math.hpp>
 #include <score/tools/IdentifierGeneration.hpp>
@@ -34,6 +36,7 @@
 #include <score/document/DocumentContext.hpp>
 #include <score/document/DocumentInterface.hpp>
 #include <score/tools/Bind.hpp>
+#include <score/graphics/ItemBounder.hpp>
 
 #include <core/document/Document.hpp>
 #include <core/document/DocumentModel.hpp>
@@ -45,6 +48,7 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
+#include <core/document/DocumentView.hpp>
 #include <QAction>
 #include <QApplication>
 #include <QInputDialog>
@@ -53,6 +57,29 @@
 
 namespace Acousmoscribe
 {
+SoftGradient::SoftGradient(QGraphicsItem* parent)
+  : QGraphicsItem{parent}
+{
+  this->setZValue(2);
+
+}
+static const QLinearGradient black_gradient = [] {
+  QLinearGradient g;
+  g.setStart(0., 0.);
+  g.setFinalStop(200., 1.);
+  int b = 20;
+
+  g.setColorAt(0, QColor(b, b, b, 255));
+  g.setColorAt(0.9, QColor(b, b, b, 235));
+  g.setColorAt(1.0, QColor(b, b, b, 0));
+  return g;
+}();
+
+void SoftGradient::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+  painter->fillRect(m_rect, black_gradient);
+}
+
 Presenter::Presenter(
     const Acousmoscribe::Model& layer, View* view,
     const Process::Context& ctx, QObject* parent)
@@ -65,6 +92,15 @@ Presenter::Presenter(
 {
   putToFront();
 
+  auto* v = static_cast<Scenario::ScenarioDocumentView*>(&ctx.document.view()->viewDelegate());
+  {
+    con(v->view(), &Scenario::ProcessGraphicsView::scrolled,
+        this, [this] { updateKeyPosition(); });
+    con(v->view(), &Scenario::ProcessGraphicsView::horizontalZoom,
+        this, [this] { updateKeyPosition(); });
+    con(v->view(), &Scenario::ProcessGraphicsView::visibleRectChanged,
+        this, [this] { updateKeyPosition(); });
+  }
   auto& model = layer;
 
   con(model, &Model::melodicKeysNeedUpdate, this, [&] {
@@ -102,6 +138,11 @@ Presenter::Presenter(
   {
     m_spectralKeyView = new SpectralKeyView{*model.spectralKey, *this, m_view};
     updateSpectralKey(*m_spectralKeyView);
+  }
+
+  {
+    m_keyGradient = new SoftGradient{m_view};
+    m_keyGradient->setRect({0, 0, 220, 50});
   }
 
   model.signs.added.connect<&Presenter::on_signAdded>(this);
@@ -144,6 +185,16 @@ Presenter::~Presenter()
 {
 }
 
+void Presenter::updateKeyPosition()
+{
+  if(auto [x, ok] = m_bounder.bound(m_view, 0., 100.); ok)
+  {
+    m_keyGradient->setPos({x, 0.});
+    updateMelodicKey(*m_melodicKeyView);
+    updateSpectralKey(*m_spectralKeyView);
+  }
+}
+
 
 
 void Presenter::on_selectionChanged(SignView* v, bool ok)
@@ -169,6 +220,7 @@ void Presenter::setWidth(qreal val, qreal defaultWidth)
 void Presenter::setHeight(qreal val)
 {
   m_view->setHeight(val);
+  m_keyGradient->setRect({0, 0, 220, val});
   updateMelodicKey(*m_melodicKeyView);
   updateSpectralKey(*m_spectralKeyView);
   for (auto sign : m_signs)
@@ -207,7 +259,7 @@ const Acousmoscribe::Model& Presenter::model() const noexcept
 void Presenter::updateMelodicKey(MelodicKeyView& v)
 {
   const auto keyRect = v.computeRect();
-  const auto newPos = keyRect.topLeft();
+  const auto newPos = QPointF{m_bounder.x() + keyRect.topLeft().x(), keyRect.topLeft().y()};
   if (newPos != v.pos())
   {
     v.setPos(newPos);
@@ -220,7 +272,7 @@ void Presenter::updateMelodicKey(MelodicKeyView& v)
 void Presenter::updateSpectralKey(SpectralKeyView& s)
 {
   const auto keyRect = s.computeRect();
-  const auto newPos = keyRect.topLeft();
+  const auto newPos = QPointF{m_bounder.x() + keyRect.topLeft().x(), keyRect.topLeft().y()};
   if (newPos != s.pos())
   {
     s.setPos(newPos);

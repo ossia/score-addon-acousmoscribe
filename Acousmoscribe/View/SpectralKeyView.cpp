@@ -21,6 +21,7 @@ SpectralKeyView::SpectralKeyView(const SpectralKey& sk, Presenter& p, View* pare
   this->setFlag(QGraphicsItem::ItemIsMovable, false);
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
   this->setAcceptHoverEvents(true);
+  this->setZValue(3);
 }
 
 void SpectralKeyView::paint(
@@ -245,11 +246,10 @@ QRectF SpectralKeyView::computeRect() const noexcept
 {
   auto& view = *(View*)parentItem();
   const auto h = view.height();
-  const auto w = view.defaultWidth();
   const QRectF rect{
       0, // 35 à changer (instant de départ)
       0,
-      0.1*w,
+      100.,
       h};
 
   return rect;

@@ -20,6 +20,7 @@ SignView::SignView(const Sign& n, Presenter& presenter, View* parent)
   this->setFlag(QGraphicsItem::ItemIsMovable, true);
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
   this->setAcceptHoverEvents(true);
+  this->setZValue(1);
 }
 
 QPolygonF SignView::polygon() const noexcept
@@ -235,9 +236,8 @@ QPointF SignView::closestPos(QPointF newPos) const noexcept
   const auto height = rect.height();
 
   const auto w = view.defaultWidth();
-  double offset = 0.2 * w; // corresponds to the space of the 2 keys
 
-  newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left() + offset)));
+  newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
   newPos.setY(0);
 
   return newPos;

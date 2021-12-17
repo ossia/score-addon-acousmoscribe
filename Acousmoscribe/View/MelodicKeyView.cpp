@@ -21,6 +21,7 @@ MelodicKeyView::MelodicKeyView(const MelodicKey& mk, Presenter& p, View* parent)
   this->setFlag(QGraphicsItem::ItemIsMovable, false);
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
   this->setAcceptHoverEvents(true);
+  this->setZValue(3);
 }
 
 void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -42,7 +43,7 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
   //painter->setBrush(QBrush(fillColor));
   //painter->drawRect(x0, y0, w, h);
-  painter->drawLine(x0 + w - 5, y0 + 15, x0 + w - 5, h - 15);
+  //painter->drawLine(x0 + w - 5, y0 + 15, x0 + w - 5, h - 15);
   painter->setBrush(QBrush(drawColor));
 
   float yy0 = -0.05 * h;
@@ -141,11 +142,10 @@ QRectF MelodicKeyView::computeRect() const noexcept
 {
   auto& view = *(View*)parentItem();
   const auto h = view.height();
-  const auto w = view.defaultWidth();
   const QRectF rect{
-      0.1*w,
+      100.,
       0,
-      0.1*w,
+      100.,
       h};
 
   return rect;

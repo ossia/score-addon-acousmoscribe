@@ -10,7 +10,7 @@
 #include <Acousmoscribe/Commands/MoveSigns.hpp>
 #include <Acousmoscribe/Commands/ChangeSign.hpp>
 
-
+#include <score/graphics/ItemBounder.hpp>
 #include <score/command/Dispatchers/SingleOngoingCommandDispatcher.hpp>
 #include <score/command/Dispatchers/CommandDispatcher.hpp>
 
@@ -26,6 +26,22 @@ class MelodicKey;
 class MelodicKeyView;
 class SpectralKey;
 class SpectralKeyView;
+
+class SoftGradient : public QGraphicsItem {
+public:
+  explicit SoftGradient(QGraphicsItem* parent);
+  QRectF boundingRect() const override { return m_rect; }
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+
+  void setRect(QRectF r)
+  {
+    prepareGeometryChange();
+    m_rect = r;
+    update();
+  }
+private:
+  QRectF m_rect;
+};
 
 class Presenter final
     : public Process::LayerPresenter
@@ -101,6 +117,7 @@ public:
 
 private:
 
+  void updateKeyPosition();
   void updateSpectralKey(SpectralKeyView&);
   void on_spectralKeyAdded(const SpectralKey&);
 //  void on_spectralKeyRemoving(const SpectralKey&);
@@ -119,6 +136,7 @@ private:
   View* m_view{};
   MelodicKeyView* m_melodicKeyView{};
   SpectralKeyView* m_spectralKeyView{};
+  SoftGradient* m_keyGradient{};
   std::vector<SignView*> m_signs;
   std::vector<SignView*> m_selectedSigns;
 
@@ -128,6 +146,7 @@ private:
 
 
   std::optional<double> m_origMoveStart{};
+  score::ItemBounder m_bounder;
 
   ZoomRatio m_zr{};
 };
