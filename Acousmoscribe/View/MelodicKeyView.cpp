@@ -85,7 +85,48 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
   float y_range = (pitch+1)*h_pitch/7;;
   painter->drawLine(QPoint(x_pitch, y_range), QPoint(x_pitch + w/2, y_range));
 
+  if(m_mousePos)
+  {
+    pen.setStyle(Qt::SolidLine);
+    painter->setFont(QFont("Sans", 7));
+
+    QRectF r1 = pitchButtonRect();
+    if(r1.contains(*m_mousePos))
+      pen.setColor(Qt::blue);
+    else
+      pen.setColor(Qt::black);
+    painter->setPen(pen);
+    painter->drawRect(r1);
+    painter->drawText(r1, "PITCH", QTextOption(Qt::AlignCenter));
+
+
+    QRectF r2 = rangeButtonRect();
+    if(r2.contains(*m_mousePos))
+      pen.setColor(Qt::blue);
+    else
+      pen.setColor(Qt::black);
+    painter->setPen(pen);
+    painter->drawRect(r2);
+    painter->drawText(r2, "RANGE", QTextOption(Qt::AlignCenter));
+  }
   painter->setRenderHint(QPainter::Antialiasing, false);
+
+}
+
+QRectF MelodicKeyView::pitchButtonRect() const noexcept
+{
+  float w = m_width;
+  float h = m_height*0.99;
+  const int border = 3;
+  return QRectF{0, 0.85 * h, w / 2, 0.15 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF MelodicKeyView::rangeButtonRect() const noexcept
+{
+  float w = m_width;
+  float h = m_height*0.99;
+  const int border = 3;
+  return QRectF{w / 2, 0.85 * h, w / 2, 0.15 * h}.adjusted(border, border, -border, -border);
 }
 
 QRectF MelodicKeyView::computeRect() const noexcept
@@ -110,21 +151,16 @@ bool MelodicKeyView::canEdit() const
 
 void MelodicKeyView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-  const auto mods = QGuiApplication::keyboardModifiers();
   setSelected(true);
 
   m_action = None;
 
   if (canEdit())
   {
-    if (mods & Qt::ShiftModifier)
-    {
-      m_action = ChangeRange;
-    }
-    else
-    {
+    if(pitchButtonRect().contains(event->pos()))
       m_action = ChangePitch;
-    }
+    else if (rangeButtonRect().contains(event->pos()))
+      m_action = ChangeRange;
   }
   event->accept();
 }
@@ -139,19 +175,35 @@ void MelodicKeyView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
       {
         Pitch p = (Pitch) (((int) melodicKey.pitch() + 1)%7);
         m_presenter.on_melodicKeyPitchChanged(melodicKey, p);
-        std::cout << "done on_melodicKeyPitchChanged\n";
         break;
       }
       case ChangeRange:
       {
         Range r = (Range) (((int) melodicKey.range() + 1)%3);
         m_presenter.on_melodicKeyRangeChanged(melodicKey, r);
-        std::cout << "done on_melodicKeyRangeChanged\n";
         break;
       }
+      default:
+        break;
     }
   }
   event->accept();
   m_action = None;
+}
+
+void MelodicKeyView::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = event->pos();
+  update();
+}
+void MelodicKeyView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = event->pos();
+  update();
+}
+void MelodicKeyView::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+  m_mousePos = std::nullopt;
+  update();
 }
 }

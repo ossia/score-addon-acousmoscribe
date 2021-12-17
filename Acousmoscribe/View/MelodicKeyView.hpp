@@ -47,10 +47,19 @@ private:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
+  void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+  void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
+
+  QRectF pitchButtonRect() const noexcept;
+  QRectF rangeButtonRect() const noexcept;
+
   Presenter& m_presenter;
 
   float m_width{};
   float m_height{};
+
+  std::optional<QPointF> m_mousePos;
 
   enum Action
   {
