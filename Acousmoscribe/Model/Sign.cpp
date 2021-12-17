@@ -40,15 +40,15 @@ double Sign::end() const noexcept {
 /*
  * Getter de sign sur les profiles
  */
-DynamicProfile Sign::dynamicProfile() const {
+const DynamicProfile& Sign::dynamicProfile() const {
     return m_impl.dynamicProfile;
 }
 
-MelodicProfile Sign::melodicProfile() const {
+const MelodicProfile& Sign::melodicProfile() const {
     return m_impl.melodicProfile;
 }
 
-RhythmicProfile Sign::rhythmicProfile() const {
+const RhythmicProfile& Sign::rhythmicProfile() const {
     return m_impl.rhythmicProfile;
 }
 

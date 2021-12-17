@@ -52,6 +52,20 @@ private:
   void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
+  bool contains(const QPointF& point) const override;
+  QPainterPath shape() const override;
+
+  QRectF changeGrainRect() const noexcept;
+  QRectF changeRhytmicProfileSpeedRect() const noexcept;
+  QRectF changeMelodicProfileVariationRect() const noexcept;
+  QRectF changeRythmicProfileAccelerationRect() const noexcept;
+  QRectF changeMelodicProfilePitchRect() const noexcept;
+  QRectF changeMelodicProfilePitchEndRect() const noexcept;
+  QRectF changeMelodicProfileVolumeStartRect() const noexcept;
+  QRectF changeMelodicProfileVolumeEndRect() const noexcept;
+
+  QPolygonF polygon() const noexcept;
+
   Presenter& m_presenter;
 
   float m_width{};

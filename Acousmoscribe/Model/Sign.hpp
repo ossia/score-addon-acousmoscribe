@@ -54,9 +54,9 @@ public:
     double start() const noexcept;
     double duration() const noexcept;
     double end() const noexcept;
-    DynamicProfile dynamicProfile() const;
-    MelodicProfile melodicProfile() const;
-    RhythmicProfile rhythmicProfile() const;
+    const DynamicProfile& dynamicProfile() const;
+    const MelodicProfile& melodicProfile() const;
+    const RhythmicProfile& rhythmicProfile() const;
     Grain grain() const;
 
     void scale(double s) noexcept;

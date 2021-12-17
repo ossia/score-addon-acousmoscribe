@@ -22,6 +22,23 @@ SignView::SignView(const Sign& n, Presenter& presenter, View* parent)
   this->setAcceptHoverEvents(true);
 }
 
+QPolygonF SignView::polygon() const noexcept
+{
+  QPolygonF p;
+  p.reserve(4);
+
+  const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
+  const auto& profile = sign.dynamicProfile();
+  const float volumeStart = profile.volumeStart;
+  const float volumeEnd = profile.volumeEnd;
+
+  p.push_back({x0,     y0 + h});
+  p.push_back({x0,     y0 + h * (1 - volumeStart)});
+  p.push_back({x0 + w, y0 + h * (1 - volumeEnd)});
+  p.push_back({x0 + w, y0 + h});
+
+  return p;
+}
 void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
   painter->setRenderHint(QPainter::Antialiasing, true);
@@ -31,14 +48,14 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   painter->setPen(p);
 
   const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
-  float x_left = x0;
+  //float x_left = x0;
   float x_right = x0 + w;
 
   Grain grain = sign.grain();
   Speed speed = sign.rhythmicProfile().speed;
   Acceleration acc = sign.rhythmicProfile().acceleration;
 
-  double duration = sign.duration();
+  //double duration = sign.duration();
   float volumeStart = sign.dynamicProfile().volumeStart;
   float volumeEnd = sign.dynamicProfile().volumeEnd;
   float volumeUsed;
@@ -52,10 +69,10 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   QPointF d(x0 + w, y0 + h);
 
   double x_pitch = x0; //x coordinate of the melodic profile on the sign
-  volumeUsed = std::max(volumeStart, volumeEnd);
+  volumeUsed = volumeStart;// std::max(volumeStart, volumeEnd);
   if (volumeUsed == volumeStart)
   {
-    x_pitch += x_right*0.015;;
+    x_pitch += x_right*0.025;;
   }
   else
   {
@@ -63,17 +80,16 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   }
 
   p.setStyle(Qt::DotLine);
-  painter->setBrush(Qt::white);
-  p.setColor(Qt::white);
-  painter->setPen(p);
-  QPointF points[4] = {a, b, c, d};
-  painter->drawPolygon(points, 4);
+  painter->setBrush(fillColor);
+  //p.setColor(baseColor);
+  //painter->setPen(p);
+  //painter->drawPolygon(polygon());
 
-  QColor col = Qt::black;
+  QColor col = drawColor;
   if(isSelected())
-    col = Qt::blue;
+    col = selectColor;
   else if(m_mousePos)
-    col = QColor(Qt::blue).lighter();
+    col = focusColor;
 
   p.setColor(col);
   p.setCapStyle(Qt::RoundCap);
@@ -142,58 +158,73 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 
   /* MELODIC */
 
-  /* it doesn't work for now, so we let it hidden :) */
-  float h_pitch = volumeUsed * 0.65;
-  float y_pitch;
-
-  float att_rel = 1;
-  if (volumeStart < volumeEnd)
-    att_rel = -1;
+  const float h_pitch = volumeUsed * 0.65;
 
   float pitchY[7];
-
+  // Draw pitch points
+  const bool focusedOrSelected = this->isSelected() || this->m_mousePos;
   for (int i = 1; i <= 7; i++)
   {
-    y_pitch = y0 + h - volumeUsed * h + i * h_pitch * h / 5;
+    const float y_pitch = y0 + h - volumeUsed * h + i * h_pitch * h / 5;
     pitchY[i - 1] = y_pitch;
-    if (i == 4)
+
+    if(focusedOrSelected)
     {
-      p.setWidth(5); // the 4th point is bigger
-      painter->setPen(p);
-      painter->drawPoint(QPoint(x_pitch, y_pitch));
-      p.setWidth(2);
-      painter->setPen(p);
-    }
-    else
-    {
-      painter->drawPoint(QPoint(x_pitch, y_pitch));
+      if (i == 4)
+      {
+        p.setWidth(5); // the 4th point is bigger
+        painter->setPen(p);
+        painter->drawPoint(QPoint(x_pitch, y_pitch));
+        p.setWidth(2);
+        painter->setPen(p);
+      }
+      else
+      {
+        painter->drawPoint(QPoint(x_pitch, y_pitch));
+      }
     }
   }
+
+  // Draw pitch line
+  {
   p.setWidth(2);
   painter->setPen(p);
 
-  QPoint firstP;
-  QPoint secondP;
-
-  painter->setPen(p);
-
-  float use1, use2;
-  if (volumeStart < volumeEnd)
-  {
-    use1 = w * (att_rel * (0.025 + 0.04));
-    use2 = 0.05 * w * att_rel;
-  }
-  else
-  {
-    use1 = 0.05 * w * att_rel;
-    use2 = w * (att_rel * (0.025 + 0.04));
-  }
-
-  firstP = QPoint(x_pitch + use1, pitchY[pitch]);
-  secondP = QPoint(x_pitch + use2, pitchY[pitchEnd]);
+  auto firstP = QPoint(x_pitch + 0.015 * w, pitchY[pitch]);
+  auto secondP = QPoint(x_pitch + 0.3 * w, pitchY[pitchEnd]);
 
   painter->drawLine(firstP, secondP);
+  }
 
+  // Draw control buttons
+  if(m_mousePos && w > 30)
+  {
+    p.setStyle(Qt::SolidLine);
+
+    painter->setFont(buttonFont(w/4., h/10.));
+
+    const auto& textOpts = buttonTextOptions();
+    for(auto [r1, text] : {
+        std::make_pair(changeGrainRect(), "GRN"),
+        std::make_pair(changeRhytmicProfileSpeedRect(), "SPD"),
+        std::make_pair(changeMelodicProfileVariationRect(), "VAR"),
+        std::make_pair(changeRythmicProfileAccelerationRect(), "ACC"),
+        std::make_pair(changeMelodicProfilePitchRect(), "| P"),
+        std::make_pair(changeMelodicProfilePitchEndRect(), "P |"),
+        std::make_pair(changeMelodicProfileVolumeStartRect(), "| V"),
+        std::make_pair(changeMelodicProfileVolumeEndRect(), "V |"),
+      })
+    {
+      if(r1.contains(*m_mousePos))
+        p.setColor(focusColor);
+      else
+        p.setColor(drawColor);
+
+      painter->setPen(p);
+      painter->drawRect(r1);
+      painter->drawText(r1, text, textOpts);
+    }
+  }
   painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
@@ -210,6 +241,31 @@ QPointF SignView::closestPos(QPointF newPos) const noexcept
   newPos.setY(0);
 
   return newPos;
+}
+
+bool SignView::contains(const QPointF& point) const
+{
+  if(point.y() > 0.8 * m_height)
+    return true;
+  if(polygon().containsPoint(point, {}))
+    return true;
+  return false;
+}
+QPainterPath  SignView::shape() const
+{
+  QPainterPath p;
+
+  const auto& profile = sign.dynamicProfile();
+  const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
+
+  p.moveTo(0, (1 - profile.volumeStart) * h);
+  p.lineTo(0, m_height);
+  p.lineTo(m_width, m_height);
+  p.lineTo(m_width, (1 - profile.volumeEnd) * h);
+  p.closeSubpath();
+
+  return p;
+
 }
 
 QRectF SignView::computeRect() const noexcept
@@ -243,7 +299,14 @@ QVariant SignView::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
 
 void SignView::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
+  if(!contains(event->pos()))
+  {
+    hoverLeaveEvent(event);
+    return;
+  }
+
   m_mousePos = event->pos();
+
   if (event->pos().x() >= this->boundingRect().width() - 2)
   {
     auto& skin = score::Skin::instance();
@@ -254,57 +317,31 @@ void SignView::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
     this->unsetCursor();
   }
 
-  QGraphicsItem::hoverEnterEvent(event);
   update();
 }
 
 void SignView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
+  if(!contains(event->pos()))
+  {
+    hoverLeaveEvent(event);
+    return;
+  }
+
   m_mousePos = event->pos();
   float h = this->boundingRect().height();
   float w = this->boundingRect().width();
 
-  const auto mods = QGuiApplication::keyboardModifiers();
-
-  if (event->pos().x() >= w - 10 && event->pos().y() <= h / 2)
+  if (event->pos().x() >= w - 10 && event->pos().y() <= h * 0.8)
   {
     auto& skin = score::Skin::instance(); // Scale
     this->setCursor(skin.CursorScaleH);
-  }
-  else if (event->pos().y() <= 10 && (2 <= event->pos().x() <= w - 2))
-  {
-    this->setCursor(Qt::PointingHandCursor); // Change grain
-  }
-  else if (event->pos().y() >= h - 10 && (2 <= event->pos().x() <= w - 2))
-  {
-    this->setCursor(Qt::PointingHandCursor); // Rhythmic speed
-  }
-  else if (event->pos().x() <= 10 && mods & Qt::NoModifier && event->pos().y() <= h / 2)
-  {
-    this->setCursor(Qt::PointingHandCursor); // Melo Variation
-  }
-  else if (event->pos().x() <= 10 && mods & Qt::ShiftModifier && event->pos().y() <= h / 2)
-  {
-    this->setCursor(Qt::UpArrowCursor); // Melo Pitch end
-  }
-  else if (event->pos().x() <= 10 && mods & Qt::ControlModifier && event->pos().y() <= h / 2)
-  {
-    this->setCursor(Qt::UpArrowCursor); // Melo Pitch
-  }
-  else if (event->pos().x() <= 10 && event->pos().y() >= h / 2)
-  {
-    this->setCursor(Qt::UpArrowCursor); // Vol start
-  }
-  else if (event->pos().x() >= w - 10 && event->pos().y() >= h / 2)
-  {
-    this->setCursor(Qt::UpArrowCursor); // Vol end
   }
   else
   {
     this->unsetCursor();
   }
 
-  QGraphicsItem::hoverMoveEvent(event);
   update();
 }
 
@@ -312,8 +349,6 @@ void SignView::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
   m_mousePos = std::nullopt;
   this->unsetCursor();
-
-  QGraphicsItem::hoverEnterEvent(event);
   update();
 }
 
@@ -325,6 +360,12 @@ bool SignView::canEdit() const
 static QPointF signview_origpoint;
 void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+  if(!contains(event->pos()))
+  {
+    event->ignore();
+    return;
+  }
+
   const auto mods = QGuiApplication::keyboardModifiers();
   if (!(mods & Qt::ControlModifier) && !isSelected())
     m_presenter.on_deselectOtherSigns();
@@ -338,35 +379,40 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
   if (canEdit())
   {
-    if (event->pos().x() >= w - 10 && event->pos().y() <= h / 2)
+    const auto pos = event->pos();
+    if (event->pos().x() >= w - 10 && event->pos().y() <= h * 0.8)
     {
       m_action = Scale;
     }
-    else if (event->pos().y() <= 10 && (2 <= event->pos().x() <= w - 2))
+    else if (changeGrainRect().contains(pos))
     {
       m_action = ChangeGrain;
     }
-    else if (event->pos().y() >= h - 10 && (2 <= event->pos().x() <= w - 2))
+    else if (changeRhytmicProfileSpeedRect().contains(pos))
     {
       m_action = ChangeRhythmicProfileSpeed;
     }
-    else if (event->pos().x() <= 10 && mods & Qt::NoModifier && event->pos().y() <= h / 2)
+    else if (changeRythmicProfileAccelerationRect().contains(pos))
+    {
+      m_action = ChangeRhythmicProfileAcceleration;
+    }
+    else if (changeMelodicProfileVariationRect().contains(pos))
     {
       m_action = ChangeMelodicProfileVariation;
     }
-    else if (event->pos().x() <= 10 && mods & Qt::ShiftModifier && event->pos().y() <= h / 2)
-    {
-      m_action = ChangeMelodicProfilePitchEnd;
-    }
-    else if (event->pos().x() <= 10 && mods & Qt::ControlModifier && event->pos().y() <= h / 2)
+    else if (changeMelodicProfilePitchRect().contains(pos))
     {
       m_action = ChangeMelodicProfilePitch;
     }
-    else if (event->pos().x() <= 10 && event->pos().y() >= h / 2)
+    else if (changeMelodicProfilePitchEndRect().contains(pos))
+    {
+      m_action = ChangeMelodicProfilePitchEnd;
+    }
+    else if (changeMelodicProfileVolumeStartRect().contains(pos))
     {
       m_action = ChangeSignVolumeStart;
     }
-    else if (event->pos().x() >= w - 10 && event->pos().y() >= h / 2)
+    else if (changeMelodicProfileVolumeEndRect().contains(pos))
     {
       m_action = ChangeSignVolumeEnd;
     }
@@ -377,6 +423,56 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
     }
   }
   event->accept();
+}
+
+QRectF SignView::changeGrainRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 1 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SignView::changeRhytmicProfileSpeedRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 1 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeMelodicProfileVariationRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 2 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeRythmicProfileAccelerationRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 2 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeMelodicProfilePitchRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 0, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeMelodicProfilePitchEndRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeMelodicProfileVolumeStartRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 0, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeMelodicProfileVolumeEndRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
 void SignView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -446,13 +542,13 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
       }
       case ChangeMelodicProfilePitch:
       {
-        Pitch p = (Pitch)(((int)sign.melodicProfile().pitch + 1) % 7);
+        Pitch p = (Pitch)(((int)sign.melodicProfile().pitch - 1 + 7) % 7);
         m_presenter.on_signMelodicProfilePitchChanged(sign, p);
         break;
       }
       case ChangeMelodicProfilePitchEnd:
       {
-        Pitch pe = (Pitch)(((int)sign.melodicProfile().pitchEnd + 1) % 7);
+        Pitch pe = (Pitch)(((int)sign.melodicProfile().pitchEnd - 1 + 7) % 7);
         m_presenter.on_signMelodicProfilePitchEndChanged(sign, pe);
         break;
       }

@@ -213,10 +213,10 @@ void SpectralKeyView::paint(
     }
   }
 
-  if(m_mousePos)
+  if(m_mousePos && w > 30)
   {
     p.setStyle(Qt::SolidLine);
-    painter->setFont(QFont("Sans", 7, QFont::Bold));
+    painter->setFont(buttonFont(w/4., h/10.));
 
     for(auto [r1, text] : {
         std::make_pair(changeNatureButtonRect(), "N"),

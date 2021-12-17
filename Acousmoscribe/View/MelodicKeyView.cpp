@@ -40,27 +40,32 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
   /* Background Rect */
 
-  painter->setBrush(fillColor);
+  //painter->setBrush(QBrush(fillColor));
   //painter->drawRect(x0, y0, w, h);
+  painter->drawLine(x0 + w - 5, y0 + 15, x0 + w - 5, h - 15);
+  painter->setBrush(QBrush(drawColor));
 
-  float h_pitch = h*4/5;
+  float yy0 = -0.05 * h;
+  float h_pitch = h * 0.95;
   float x_pitch = w * 1/4;
   float y_pitch;
   for (int i = 1; i <= 7; i++)
   {
-    y_pitch = i * h_pitch / 7;
+    y_pitch = yy0 + i * h_pitch / 7;
     if (i == 4)
     {
       pen.setWidth(3); // the 4th point is bigger
       painter->setPen(pen);
-      painter->drawPoint(QPoint(x_pitch, y_pitch));
+      painter->drawEllipse(x_pitch, y_pitch, 8, 8);
       pen.setWidth(2);
       painter->setPen(pen);
     }
-    else{
-     painter->drawPoint(QPoint(x_pitch, y_pitch));
+    else
+    {
+      painter->drawEllipse(x_pitch, y_pitch, 5, 5);
     }
   }
+
 
   switch(range)
   {
@@ -81,15 +86,18 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
       break;
   }
 
+
+  float y_range = yy0 + (pitch+1)*h_pitch/7;
+  for(int i = x_pitch + 20; i < x_pitch + w / 2; i += 20) {
+    painter->drawEllipse(i, y_range, 5, 5);
+  }
+
   painter->setPen(pen);
-
-  float y_range = (pitch+1)*h_pitch/7;;
-  painter->drawLine(QPoint(x_pitch, y_range), QPoint(x_pitch + w/2, y_range));
-
+  painter->setBrush(fillColor);
   if(m_mousePos)
   {
     pen.setStyle(Qt::SolidLine);
-    painter->setFont(QFont("Sans", 7));
+    painter->setFont(buttonFont(w/4., h/5.));
 
     QRectF r1 = pitchButtonRect();
     if(r1.contains(*m_mousePos))
@@ -110,8 +118,8 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
     painter->drawRect(r2);
     painter->drawText(r2, "RANGE", QTextOption(Qt::AlignCenter));
   }
-  painter->setRenderHint(QPainter::Antialiasing, false);
 
+  painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
 
