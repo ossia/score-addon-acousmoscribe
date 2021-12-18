@@ -68,30 +68,43 @@ void MelodicKeyView::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
   }
 
 
+  float y_range = yy0 + (pitch+1)*h_pitch/7;
+  const double incr = 15.;
   switch(range)
   {
     case weak:
-      pen.setStyle(Qt::DotLine);
+    {
+      // Dots
+      for(int i = x_pitch + incr; i < x_pitch + w / 2; i += incr) {
+        painter->drawEllipse(i, y_range, 5, 5);
+      }
       break;
+    }
 
     case normal:
-      pen.setStyle(Qt::DashDotLine);
+    {
+      // Dash & Dots
+      bool ellipse = false;
+      for(int i = x_pitch + incr; i < x_pitch + w / 2; i += incr) {
+        if(ellipse)
+          painter->drawEllipse(i, y_range, 5, 5);
+        else
+          painter->fillRect(i - 2, y_range, 0.5 * incr + 2, 5, drawColor);
+
+        ellipse = !ellipse;
+      }
       break;
+    }
 
     case strong:
-      pen.setStyle(Qt::SolidLine);
-      break;
-
     default:
-      pen.setStyle(Qt::SolidLine);
+    {
+      // Line
+      painter->fillRect(x_pitch + incr - 2, y_range, 0.4 * w, 5, drawColor);
       break;
+    }
   }
 
-
-  float y_range = yy0 + (pitch+1)*h_pitch/7;
-  for(int i = x_pitch + 20; i < x_pitch + w / 2; i += 20) {
-    painter->drawEllipse(i, y_range, 5, 5);
-  }
 
   painter->setPen(pen);
   painter->setBrush(fillColor);
