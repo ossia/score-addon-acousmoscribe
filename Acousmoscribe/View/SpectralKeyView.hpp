@@ -63,8 +63,8 @@ private:
   QRectF changeRich2ButtonRect() const noexcept;
   QRectF changeHybridButtonRect() const noexcept;
   QRectF changeHybrid2ButtonRect() const noexcept;
-  QRectF changeWarpedButtonRect() const noexcept;
-  QRectF changeWarped2ButtonRect() const noexcept;
+  QRectF changeColorationButtonRect() const noexcept;
+  QRectF changeColoration2ButtonRect() const noexcept;
 
   float m_width{};
   float m_height{};
@@ -78,8 +78,8 @@ private:
     ChangeRich,
     ChangeHybrid,
     ChangeHybrid2,
-    ChangeWarped,
-    ChangeWarped2
+    ChangeColoration,
+    ChangeColoration2,
   } m_action{};
 };
 }
