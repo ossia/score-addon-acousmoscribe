@@ -79,12 +79,16 @@ public:
 
   void on_spectralKeyNatureChanged(const SpectralKey&, Nature nature);
   void on_spectralKeyNature2Changed(const SpectralKey&, Nature nature);
+  void on_spectralKeyHybridNatureChanged(const SpectralKey&, Nature nature);
+  void on_spectralKeyHybridNature2Changed(const SpectralKey&, Nature nature);
   void on_spectralKeyIsHybridChanged(const SpectralKey&, bool isHybrid);
   void on_spectralKeyIsHybrid2Changed(const SpectralKey&, bool isHybrid);
   void on_spectralKeyIsRichChanged(const SpectralKey&, bool isRich);
   void on_spectralKeyIsRich2Changed(const SpectralKey&, bool isRich);
-  void on_spectralKeyIsWarpedChanged(const SpectralKey&, bool warped);
-  void on_spectralKeyIsWarped2Changed(const SpectralKey&, bool warped);
+  void on_spectralKeyColorationChanged(const SpectralKey&,Coloration c);
+  void on_spectralKeyColoration2Changed(const SpectralKey&,Coloration c);
+
+
 
 
 
@@ -104,12 +108,12 @@ public:
   void on_signMelodicProfilePitchChanged(const Sign&, Pitch newPitch);
   void on_signMelodicProfilePitchEndChanged(const Sign&, Pitch newPitchEnd);
   void on_signMelodicProfileVariationChanged(const Sign&, Variation newVar);
+  void on_signMelodicProfilePaceChanged(const Sign&, Pace pace);
 
   //void on_signRhythmicProfileChanged(Sign& v, RhythmicProfile rp);
   void on_signRhythmicProfileSpeedChanged(const Sign&, Speed newSpeed);
   void on_signRhythmicProfileAccelerationChanged(const Sign&, Acceleration newAcc);
   void on_signRhythmicProfileIsRandomChanged(const Sign&, bool newIsRandom);
-
   void on_signGrainChanged(const Sign&, Grain g);
 
   void on_selectionChanged(SignView*, bool ok);

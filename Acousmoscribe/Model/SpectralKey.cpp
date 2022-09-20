@@ -36,6 +36,21 @@ Nature SpectralKey::nature2() const noexcept {
     return m_impl.nature2;
 }
 
+Nature SpectralKey::hybrid_nature() const noexcept {
+    return m_impl.hybrid_nature;
+}
+
+Nature SpectralKey::hybrid_nature2() const noexcept {
+    return m_impl.hybrid_nature2;
+}
+
+Coloration SpectralKey::coloration() const noexcept{
+  return m_impl.coloration;
+}
+
+Coloration SpectralKey::coloration2() const noexcept{
+  return m_impl.coloration2;
+}
 bool SpectralKey::isHybrid() const noexcept {
     return m_impl.isHybrid;
 }
@@ -51,14 +66,10 @@ bool SpectralKey::isRich() const noexcept {
 bool SpectralKey::isRich2() const noexcept {
     return m_impl.isRich2;
 }
-
-bool SpectralKey::isWarped() const noexcept {
-    return m_impl.isWarped;
+bool SpectralKey::canBeHybrid(Nature n) const noexcept {
+  return n == Nature::tonic || n == Nature::inharmonic;
 }
 
-bool SpectralKey::isWarped2() const noexcept {
-    return m_impl.isWarped2;
-}
 
 SpectralKeyData SpectralKey::spectralKeyData() const {
     return m_impl;
@@ -70,6 +81,22 @@ void SpectralKey::setNature(Nature nature){
 
 void SpectralKey::setNature2(Nature nature2){
     m_impl.nature2 = nature2;
+}
+
+void SpectralKey::setHybridNature(Nature nature){
+    m_impl.hybrid_nature = nature;
+}
+
+void SpectralKey::setHybridNature2(Nature nature2){
+    m_impl.hybrid_nature2 = nature2;
+}
+
+void SpectralKey::setColoration(Coloration col){
+  m_impl.coloration = col;
+}
+
+void SpectralKey::setColoration2(Coloration col){
+  m_impl.coloration2 = col;
 }
 
 void SpectralKey::setIsHybrid(bool isHybrid){
@@ -88,14 +115,6 @@ void SpectralKey::setIsRich2(bool isRich){
     m_impl.isRich2 = isRich;
 }
 
-void SpectralKey::setIsWarped(bool isWarped){
-    m_impl.isHybrid2 = isWarped;
-}
-
-void SpectralKey::setIsWarped2(bool isWarped2){
-    m_impl.isHybrid2 = isWarped2;
-}
-
 void SpectralKey::setData(SpectralKeyData sd){
   if(m_impl != sd)
   {
@@ -109,14 +128,14 @@ void SpectralKey::setData(SpectralKeyData sd){
 template <>
 void DataStreamReader::read(const Acousmoscribe::SpectralKeyData& skd)
 {
-  m_stream << skd.nature << skd.nature2 << skd.isHybrid << skd.isHybrid2 << skd.isRich << skd.isRich2 << skd.isWarped << skd.isWarped2;
+  m_stream << skd.nature << skd.nature2 <<skd.hybrid_nature<<skd.hybrid_nature2<< skd.coloration << skd.coloration2 << skd.isHybrid << skd.isHybrid2 << skd.isRich << skd.isRich2;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SpectralKeyData& skd)
 {
-  m_stream >> skd.nature >> skd.nature2 >> skd.isHybrid >> skd.isHybrid2 >> skd.isRich >> skd.isRich2 >> skd.isWarped >> skd.isWarped2;
+  m_stream >> skd.nature >> skd.nature2 >> skd.hybrid_nature >> skd.hybrid_nature2>>skd.coloration>>skd.coloration2>> skd.isHybrid >> skd.isHybrid2 >> skd.isRich >> skd.isRich2;
   checkDelimiter();
 }
 
@@ -126,12 +145,14 @@ void JSONReader::read(const Acousmoscribe::SpectralKeyData& skd)
   stream.StartArray();
   stream.Int(skd.nature);
   stream.Int(skd.nature2);
+  stream.Int(skd.hybrid_nature);
+  stream.Int(skd.hybrid_nature2);
+  stream.Int(skd.coloration);
+  stream.Int(skd.coloration2);
   stream.Bool(skd.isHybrid);
   stream.Bool(skd.isHybrid2);
   stream.Bool(skd.isRich);
   stream.Bool(skd.isRich2);
-  stream.Bool(skd.isWarped);
-  stream.Bool(skd.isWarped2);
   stream.EndArray();
 }
 
@@ -141,12 +162,14 @@ void JSONWriter::write(Acousmoscribe::SpectralKeyData& skd)
   const auto& arr = base.GetArray();
   skd.nature = static_cast<Acousmoscribe::Nature>(arr[0].GetInt());
   skd.nature2 = static_cast<Acousmoscribe::Nature>(arr[1].GetInt());
-  skd.isHybrid = static_cast<Acousmoscribe::Nature>(arr[2].GetBool());
-  skd.isHybrid2 = static_cast<Acousmoscribe::Nature>(arr[3].GetBool());
-  skd.isRich = static_cast<Acousmoscribe::Nature>(arr[4].GetBool());
-  skd.isRich2 = static_cast<Acousmoscribe::Nature>(arr[5].GetBool());
-  skd.isWarped = static_cast<Acousmoscribe::Nature>(arr[6].GetBool());
-  skd.isWarped2 = static_cast<Acousmoscribe::Nature>(arr[7].GetBool());
+  skd.hybrid_nature = static_cast<Acousmoscribe::Nature>(arr[2].GetInt());
+  skd.hybrid_nature2 = static_cast<Acousmoscribe::Nature>(arr[3].GetInt());
+  skd.coloration = static_cast<Acousmoscribe::Coloration>(arr[4].GetInt());
+  skd.coloration2 = static_cast<Acousmoscribe::Coloration>(arr[5].GetInt());
+  skd.isHybrid = static_cast<Acousmoscribe::Nature>(arr[6].GetBool());
+  skd.isHybrid2 = static_cast<Acousmoscribe::Nature>(arr[7].GetBool());
+  skd.isRich = static_cast<Acousmoscribe::Nature>(arr[8].GetBool());
+  skd.isRich2 = static_cast<Acousmoscribe::Nature>(arr[9].GetBool());
 }
 
 /****************************
@@ -176,12 +199,14 @@ void JSONReader::read(const Acousmoscribe::SpectralKey& sk)
   stream.StartArray();
   stream.Int(sk.nature());
   stream.Int(sk.nature2());
+  stream.Int(sk.hybrid_nature());
+  stream.Int(sk.hybrid_nature2());
+  stream.Int(sk.coloration());
+  stream.Int(sk.coloration2());
   stream.Bool(sk.isHybrid());
   stream.Bool(sk.isHybrid2());
   stream.Bool(sk.isRich());
   stream.Bool(sk.isRich2());
-  stream.Bool(sk.isWarped());
-  stream.Bool(sk.isWarped2());
   stream.EndArray();
 }
 
@@ -190,11 +215,13 @@ void JSONWriter::write(Acousmoscribe::SpectralKey& sk)
 {
   const auto& arr = obj["SpectralKey"].toArray();
   Acousmoscribe::Nature n;
+  Acousmoscribe::Coloration c;
   switch (arr[0].GetInt())
   {
-  case 1: n = Acousmoscribe::tonic; break;
-  case 2: n = Acousmoscribe::inharmonic; break;
-  case 3: n = Acousmoscribe::noise; break;
+  case 1: n = Acousmoscribe::noise; break;
+  case 2: n = Acousmoscribe::tonic; break;
+  case 3: n = Acousmoscribe::inharmonic; break;
+  case 4: n = Acousmoscribe::tonic_warped; break;
   default: n = Acousmoscribe::null;
     break;
   }
@@ -202,17 +229,55 @@ void JSONWriter::write(Acousmoscribe::SpectralKey& sk)
 
   switch (arr[1].GetInt())
   {
-  case 1: n = Acousmoscribe::tonic; break;
-  case 2: n = Acousmoscribe::inharmonic; break;
-  case 3: n = Acousmoscribe::noise; break;
+  case 1: n = Acousmoscribe::noise; break;
+  case 2: n = Acousmoscribe::tonic; break;
+  case 3: n = Acousmoscribe::inharmonic; break;
+  case 4: n = Acousmoscribe::tonic_warped; break;
   default: n = Acousmoscribe::null;
     break;
   }
   sk.setNature2(n);
-  sk.setIsHybrid(arr[2].GetBool());
-  sk.setIsHybrid2(arr[3].GetBool());
-  sk.setIsRich(arr[4].GetBool());
-  sk.setIsRich2(arr[5].GetBool());
-  sk.setIsWarped(arr[6].GetBool());
-  sk.setIsWarped2(arr[7].GetBool());
+  switch(arr[2].GetInt())
+  {
+  case 1: n = Acousmoscribe::noise; break;
+  case 2: n = Acousmoscribe::tonic; break;
+  default: n = Acousmoscribe::null; break;
+  }
+  sk.setHybridNature(n);
+
+  switch(arr[3].GetInt())
+  {
+  case 1: n = Acousmoscribe::noise; break;
+  case 2: n = Acousmoscribe::tonic; break;
+  default: n = Acousmoscribe::null; break;
+  }
+  sk.setHybridNature2(n);
+
+  switch(arr[4].GetInt())
+  {
+    case 1: c = Acousmoscribe::lo; break;
+    case 2: c = Acousmoscribe::med; break;
+    case 3: c = Acousmoscribe::hi; break;
+    case 4: c = Acousmoscribe::lo_med; break;
+    case 5: c = Acousmoscribe::med_hi; break;
+    case 6: c = Acousmoscribe::lo_hi; break;
+    default: c = Acousmoscribe::neutral; break;
+  }
+  sk.setColoration(c);
+  switch(arr[5].GetInt())
+  {
+    case 1: c = Acousmoscribe::lo; break;
+    case 2: c = Acousmoscribe::med; break;
+    case 3: c = Acousmoscribe::hi; break;
+    case 4: c = Acousmoscribe::lo_med; break;
+    case 5: c = Acousmoscribe::med_hi; break;
+    case 6: c = Acousmoscribe::lo_hi; break;
+    default: c = Acousmoscribe::neutral; break;
+  }
+  sk.setColoration2(c);
+
+  sk.setIsHybrid(arr[6].GetBool());
+  sk.setIsHybrid2(arr[7].GetBool());
+  sk.setIsRich(arr[8].GetBool());
+  sk.setIsRich2(arr[9].GetBool());
 }

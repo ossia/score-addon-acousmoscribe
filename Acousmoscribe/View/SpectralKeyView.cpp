@@ -6,11 +6,14 @@
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPoint>
+#include <QToolTip>
 
 #include <Acousmoscribe/Presenter/Presenter.hpp>
 #include <Acousmoscribe/View/SpectralKeyView.hpp>
 #include <Acousmoscribe/View/View.hpp>
 #include <Acousmoscribe/View/Utils.hpp>
+#include <ossia/detail/math.hpp>
+
 
 namespace Acousmoscribe
 {
@@ -34,13 +37,15 @@ void SpectralKeyView::paint(
   const auto [x0, y0, w, h] { baseItemRect(m_width, m_height) };
 
   Nature nature = spectralKey.nature();
+  Nature h_nature = spectralKey.hybrid_nature();
+  Nature h_nature2 = spectralKey.hybrid_nature2();
   Nature nature2 = spectralKey.nature2();
+  Coloration color = spectralKey.coloration();
+  Coloration color2 = spectralKey.coloration2();
   bool rich = spectralKey.isRich();
   bool rich2 = spectralKey.isRich2();
   bool hybrid = spectralKey.isHybrid();
   bool hybrid2 = spectralKey.isHybrid2();
-  bool warped = spectralKey.isWarped();
-  bool warped2 = spectralKey.isWarped2();
 
   QPen p;
   p.setColor(drawColor);
@@ -55,21 +60,14 @@ void SpectralKeyView::paint(
 
   if (hybrid)
   {
-    switch (nature)
+    switch (h_nature)
     {
-      case tonic_inharmonic:
+      case tonic:
         p.setStyle(Qt::DashLine);
-        nature = inharmonic;
         break;
 
-      case noisy_tonic:
+      case noise:
         p.setStyle(Qt::DotLine);
-        nature = tonic;
-        break;
-
-      case noisy_inharmonic:
-        p.setStyle(Qt::DotLine);
-        nature = inharmonic;
         break;
 
       default:
@@ -78,24 +76,97 @@ void SpectralKeyView::paint(
   }
 
   painter->setPen(p);
+  QPoint lineStart(w / 5, h / 1.05);
+  QPoint lineEnd(w / 1.05, h / 5);
+  QPoint lineMid(w / 1.5, h / 1.5);
+  bool drawLo = false;
+  bool drawMed = false;
+  bool drawHi = false;
+  switch(color){
+    case lo:
+      drawLo = true;
+    break;
+    case med:
+      drawMed = true;
+    break;
+    case hi:
+     drawHi = true;
+    break;
+    case lo_med:
+     drawLo = true;
+     drawMed= true;
+    break;
+    case med_hi:
+    drawMed = true;
+    drawHi = true;
+    break;
+  case lo_hi:
+    drawLo=true;
+    drawHi = true;
+    break;
+  default:
+    break;
+  }
 
   switch (nature)
   {
     case tonic:
-      if (warped)
-      {
-        painter->drawLine(QPoint(w / 5, h / 1.05), QPoint(w / 1.5, h / 1.5));
-        painter->drawLine(QPoint(w / 1.5, h / 1.5), QPoint(w / 1.05, h / 5));
-      }
-      else
-      {
-        painter->drawLine(QPoint(w / 5, h / 1.05), QPoint(w / 1.05, h / 5));
-      }
+        painter->drawLine(lineStart, lineEnd);
+        if(drawLo)
+          painter->drawEllipse(lineStart,4,4);
+        if(drawMed)
+          painter->drawEllipse(QPoint((lineStart.x()+lineEnd.x())/2,(lineStart.y()+lineEnd.y())/2),4,4);
+        if(drawHi)
+          painter->drawEllipse(lineEnd,4,4);
       break;
 
-    case inharmonic:
-      painter->drawArc(QRectF(w / 11, h / 30, w / 3, h / 3), 9900, 2000);
-      break;
+    case tonic_warped:
+        painter->drawLine(lineStart, lineMid);
+        painter->drawLine(lineMid, lineEnd);
+        if(drawLo)
+          painter->drawEllipse(lineStart,4,4);
+        if(drawMed)
+          painter->drawEllipse(lineMid,4,4);
+        if(drawHi)
+          painter->drawEllipse(lineEnd,4,4);
+    break;
+
+  case inharmonic:{
+    QRectF r(w / 11, h / 30, w / 3, h / 3);
+    int startAngle = 225;
+    int angleSpan = 180;
+    int endAngle = (startAngle+angleSpan)%360;
+    int midAngle = (startAngle+endAngle)/2;
+    double a = r.width()/2;
+    double b = r.height()/2;
+    painter->drawArc(r, (startAngle*16), (angleSpan*16));
+
+    double startRad = ossia::radian{ossia::degree{startAngle+5}}.dataspace_value;
+    startRad = std::atan((a/b)*std::tan(startRad));
+    double loX = a*std::cos(startRad);
+    double loY = b*std::sin(startRad);
+    QPointF loPoint{-loX+r.center().x(),loY+r.center().y()};
+    if(drawLo)
+      painter->drawEllipse(loPoint,4,4);
+
+    double endRad = ossia::radian{ossia::degree{endAngle}}.dataspace_value;
+    endRad = std::atan((a/b)*std::tan(endRad));
+    double hiX = a*std::cos(endRad);
+    double hiY = b*std::sin(endRad);
+    QPointF hiPoint{hiX+r.center().x(),-hiY+r.center().y()}; //fix having to manually change the signs
+    if(drawHi)
+      painter->drawEllipse(hiPoint,4,4);
+
+    double midRad = ossia::radian{ossia::degree{midAngle}}.dataspace_value;
+    endRad = std::atan((a/b)*std::tan(midRad));
+    double medX = a*std::cos(endRad);
+    double medY = b*std::sin(endRad);
+    QPointF medPoint{medX+r.center().x(),-medY+r.center().y()}; //fix having to manually change the signs
+    if(drawMed)
+      painter->drawEllipse(medPoint,4,4);
+
+    break;
+  }
 
     case noise:
       p.setWidth(4);
@@ -108,50 +179,115 @@ void SpectralKeyView::paint(
     default:
       break;
   }
-
+  p.setStyle(Qt::SolidLine);
   if (hybrid2)
   {
-    switch (nature2)
+    switch (h_nature2)
     {
 
-      case tonic_inharmonic:
-        p.setStyle(Qt::DashLine);
-        nature2 = inharmonic;
-        break;
+    case tonic:
+      p.setStyle(Qt::DashLine);
+      break;
 
-      case noisy_tonic:
-        p.setStyle(Qt::DotLine);
-        nature2 = tonic;
-        break;
+    case noise:
+      p.setStyle(Qt::DotLine);
+      break;
 
-      case noisy_inharmonic:
-        p.setStyle(Qt::DotLine);
-        nature2 = inharmonic;
-        break;
-
-      default:
-        break;
+    default:
+      break;
     }
   }
   painter->setPen(p);
 
+  QPoint line2Start(w / 10, h / 1.2);
+  QPoint line2End(w / 1.2, h / 10);
+  QPoint line2Mid(w / 1.7, h / 2.1);
+  drawLo = false;
+  drawMed = false;
+  drawHi = false;
+  switch(color2){
+    case lo:
+      drawLo = true;
+    break;
+    case med:
+      drawMed = true;
+    break;
+    case hi:
+     drawHi = true;
+    break;
+    case lo_med:
+     drawLo = true;
+     drawMed= true;
+    break;
+    case med_hi:
+    drawMed = true;
+    drawHi = true;
+    break;
+  case lo_hi:
+    drawLo=true;
+    drawHi = true;
+    break;
+  default:
+    break;
+  }
   switch (nature2)
   {
     case tonic:
-      if (warped2)
-      {
-        painter->drawLine(QPoint(w / 10, h / 1.2), QPoint(w / 1.7, h / 2.1));
-        painter->drawLine(QPoint(w / 1.7, h / 2.1), QPoint(w / 1.2, h / 10));
-      }
-      else
-      {
-        painter->drawLine(QPoint(w / 10, h / 1.2), QPoint(w / 1.2, h / 10));
-      }
-      break;
+        painter->drawLine(line2Start, line2End);
+        if(drawLo)
+          painter->drawEllipse(line2Start,4,4);
+        if(drawMed)
+          painter->drawEllipse(QPoint((line2Start.x()+line2End.x())/2,(line2Start.y()+line2End.y())/2),4,4);
+        if(drawHi)
+          painter->drawEllipse(line2End,4,4);
+    break;
+    case tonic_warped:
+        painter->drawLine(line2Start, line2Mid);
+        painter->drawLine(line2Mid, line2End);
+        if(drawLo)
+          painter->drawEllipse(line2Start,4,4);
+        if(drawMed)
+          painter->drawEllipse(line2Mid,4,4);
+        if(drawHi)
+          painter->drawEllipse(line2End,4,4);
+    break;
+  case inharmonic:{
+    QRectF r(w / 11, h / 30, w / 2, h / 2);
 
-    case inharmonic:
-      painter->drawArc(QRectF(w / 11, h / 30, w / 2, h / 2), 9900, 2000);
-      break;
+    int startAngle = 225;
+    int angleSpan = 180;
+    int endAngle = (startAngle+angleSpan)%360;
+    int midAngle = (startAngle+endAngle)/2;
+
+    painter->drawArc(r, startAngle*16, angleSpan*16);
+    double a = r.width()/2;
+    double b = r.height()/2;
+
+    double startRad = ossia::radian{ossia::degree{startAngle+5}}.dataspace_value;
+    startRad = std::atan((a/b)*std::tan(startRad));
+    double loX = a*std::cos(startRad);
+    double loY = b*std::sin(startRad);
+    QPointF loPoint{-loX+r.center().x(),loY+r.center().y()};
+    if(drawLo)
+      painter->drawEllipse(loPoint,4,4);
+
+    double endRad = ossia::radian{ossia::degree{endAngle}}.dataspace_value;
+    endRad = std::atan((a/b)*std::tan(endRad));
+    double hiX = a*std::cos(endRad);
+    double hiY = b*std::sin(endRad);
+    QPointF hiPoint{hiX+r.center().x(),-hiY+r.center().y()}; //fix having to manually change the signs
+    if(drawHi)
+      painter->drawEllipse(hiPoint,4,4);
+
+    double midRad = ossia::radian{ossia::degree{midAngle}}.dataspace_value;
+    endRad = std::atan((a/b)*std::tan(midRad));
+    double medX = a*std::cos(endRad);
+    double medY = b*std::sin(endRad);
+    QPointF medPoint{medX+r.center().x(),-medY+r.center().y()}; //fix having to manually change the signs
+    if(drawMed)
+      painter->drawEllipse(medPoint,4,4);
+    break;
+  }
 
     case noise:
       p.setWidth(4);
@@ -226,8 +362,8 @@ void SpectralKeyView::paint(
         std::make_pair(changeRich2ButtonRect(), "R2"),
         std::make_pair(changeHybridButtonRect(), "H"),
         std::make_pair(changeHybrid2ButtonRect(), "H2"),
-        std::make_pair(changeWarpedButtonRect(), "W"),
-        std::make_pair(changeWarped2ButtonRect(), "W2"),
+        std::make_pair(changeColorationButtonRect(),"C1"),
+        std::make_pair(changeColoration2ButtonRect(),"C2"),
       })
     {
       if(r1.contains(*m_mousePos))
@@ -274,49 +410,49 @@ QRectF SpectralKeyView::changeNature2ButtonRect() const noexcept
   return QRectF{x0 + 0, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
-QRectF SpectralKeyView::changeRichButtonRect() const noexcept
-{
-  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
-  const int border = 3;
-  return QRectF{x0 + w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
-}
-
-QRectF SpectralKeyView::changeRich2ButtonRect() const noexcept
-{
-  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
-  const int border = 3;
-  return QRectF{x0 + w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
-}
 
 QRectF SpectralKeyView::changeHybridButtonRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 2 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 +  w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
 QRectF SpectralKeyView::changeHybrid2ButtonRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 2 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
-
-QRectF SpectralKeyView::changeWarpedButtonRect() const noexcept
+QRectF SpectralKeyView::changeRichButtonRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 3 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 2*w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
-QRectF SpectralKeyView::changeWarped2ButtonRect() const noexcept
+QRectF SpectralKeyView::changeRich2ButtonRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 3 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 2*w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
 }
 
+
+QRectF SpectralKeyView::changeColorationButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3*w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
+
+QRectF SpectralKeyView::changeColoration2ButtonRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 3*w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+}
 
 void SpectralKeyView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
@@ -340,14 +476,14 @@ void SpectralKeyView::mousePressEvent(QGraphicsSceneMouseEvent* event)
       m_action = ChangeRich;
     else if(changeRich2ButtonRect().contains(pos))
       m_action = ChangeRich2;
-    else if(changeHybridButtonRect().contains(pos))
+    else if(changeHybridButtonRect().contains(pos) && spectralKey.canBeHybrid(spectralKey.nature()))
       m_action = ChangeHybrid;
-    else if(changeHybrid2ButtonRect().contains(pos))
+    else if(changeHybrid2ButtonRect().contains(pos)&& spectralKey.canBeHybrid(spectralKey.nature2()))
       m_action = ChangeHybrid2;
-    else if(changeWarpedButtonRect().contains(pos))
-      m_action = ChangeWarped;
-    else if(changeWarped2ButtonRect().contains(pos))
-      m_action = ChangeWarped2;
+    else if(changeColorationButtonRect().contains(pos))
+      m_action = ChangeColoration;
+    else if(changeColoration2ButtonRect().contains(pos))
+      m_action = ChangeColoration2;
   }
   event->accept();
 }
@@ -356,16 +492,23 @@ void SpectralKeyView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
   if (canEdit())
   {
+
     switch (m_action)
     {
       case ChangeNature:{
-        Nature n = (Nature) (((int) spectralKey.nature() + 1)%7);
+        Nature n = (Nature) (((int) spectralKey.nature()%5 + 1));
         m_presenter.on_spectralKeyNatureChanged(spectralKey, n);
+        if(!spectralKey.canBeHybrid(n)){
+          m_presenter.on_spectralKeyIsHybridChanged(spectralKey, false);
+        }
         break;
       }
       case ChangeNature2:{
-        Nature n = (Nature) (((int) spectralKey.nature2() + 1)%7);
+        Nature n = (Nature) (((int) spectralKey.nature2() %5 + 1));
         m_presenter.on_spectralKeyNature2Changed(spectralKey, n);
+        if(!spectralKey.canBeHybrid(n)){
+          m_presenter.on_spectralKeyIsHybrid2Changed(spectralKey, false);
+        }
         break;
       }
       case ChangeRich:{
@@ -379,25 +522,44 @@ void SpectralKeyView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         break;
       }
       case ChangeHybrid:{
-        bool b = !(spectralKey.isHybrid());
-        m_presenter.on_spectralKeyIsHybridChanged(spectralKey, b);
+        if(spectralKey.nature()==Nature::tonic){
+          bool b = !(spectralKey.isHybrid());
+          m_presenter.on_spectralKeyIsHybridChanged(spectralKey, b);
+          m_presenter.on_spectralKeyHybridNatureChanged(spectralKey,Nature::noise);
+        } else{
+          Nature n = (Nature) (((int) spectralKey.hybrid_nature()%3 + 1));
+          bool b = ((int)n != 0);
+          m_presenter.on_spectralKeyIsHybridChanged(spectralKey, b);
+          m_presenter.on_spectralKeyHybridNatureChanged(spectralKey,n);
+        }
+
         break;
       }
       case ChangeHybrid2:{
+      if(spectralKey.nature2()==Nature::tonic){
         bool b = !(spectralKey.isHybrid2());
         m_presenter.on_spectralKeyIsHybrid2Changed(spectralKey, b);
+        m_presenter.on_spectralKeyHybridNature2Changed(spectralKey,Nature::noise);
+      } else{
+        Nature n = (Nature) (((int) spectralKey.hybrid_nature2()%3 + 1));
+        bool b = ((int)n != 0);
+        m_presenter.on_spectralKeyIsHybrid2Changed(spectralKey, b);
+        m_presenter.on_spectralKeyHybridNature2Changed(spectralKey,n);
+      }
         break;
       }
-      case ChangeWarped:{
-        bool b = !(spectralKey.isWarped());
-        m_presenter.on_spectralKeyIsWarpedChanged(spectralKey, b);
-        break;
-      }
-      case ChangeWarped2:{
-        bool b = !(spectralKey.isWarped2());
-        m_presenter.on_spectralKeyIsWarped2Changed(spectralKey, b);
-        break;
-      }
+    case ChangeColoration:{
+      Coloration c = (Coloration) ((int)(spectralKey.coloration()%7 +1));
+      m_presenter.on_spectralKeyColorationChanged(spectralKey,c);
+      break;
+    }
+    case ChangeColoration2:{
+      Coloration c = (Coloration) ((int)(spectralKey.coloration2()%7 +1));
+      m_presenter.on_spectralKeyColoration2Changed(spectralKey,c);
+      break;
+    }
+    default:
+      break;
     }
   }
   event->accept();

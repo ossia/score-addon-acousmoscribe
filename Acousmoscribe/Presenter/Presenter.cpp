@@ -327,6 +327,19 @@ void Presenter::on_spectralKeyNature2Changed(const SpectralKey& sKey, Nature nat
   m_disp.submit(new ChangeSpectralKey{sKey, data});
 }
 
+void Presenter::on_spectralKeyHybridNatureChanged(const SpectralKey& sKey, Nature nature){
+  auto data = sKey.spectralKeyData();
+  data.hybrid_nature = nature;
+  m_disp.submit(new ChangeSpectralKey{sKey, data});
+}
+
+void Presenter::on_spectralKeyHybridNature2Changed(const SpectralKey& sKey, Nature nature){
+  auto data = sKey.spectralKeyData();
+  data.hybrid_nature2 = nature;
+  m_disp.submit(new ChangeSpectralKey{sKey, data});
+}
+
+
 void Presenter::on_spectralKeyIsRichChanged(const SpectralKey& sKey, bool isRich){
   auto data = sKey.spectralKeyData();
   data.isRich = isRich;
@@ -350,17 +363,19 @@ void Presenter::on_spectralKeyIsHybrid2Changed(const SpectralKey& sKey, bool isH
   data.isHybrid2 = isHybrid;
   m_disp.submit(new ChangeSpectralKey{sKey, data});
 }
-void Presenter::on_spectralKeyIsWarpedChanged(const SpectralKey& sKey, bool warped){
-  auto data = sKey.spectralKeyData();
-  data.isWarped = warped;
-  m_disp.submit(new ChangeSpectralKey{sKey, data});
+
+void Presenter::on_spectralKeyColorationChanged(const SpectralKey& sKey, Coloration c){
+  auto data =sKey.spectralKeyData();
+  data.coloration = c;
+  m_disp.submit(new ChangeSpectralKey{sKey,data});
 }
 
-void Presenter::on_spectralKeyIsWarped2Changed(const SpectralKey& sKey, bool warped){
-  auto data = sKey.spectralKeyData();
-  data.isWarped2 = warped;
-  m_disp.submit(new ChangeSpectralKey{sKey, data});
+void Presenter::on_spectralKeyColoration2Changed(const SpectralKey& sKey, Coloration c){
+  auto data =sKey.spectralKeyData();
+  data.coloration2 = c;
+  m_disp.submit(new ChangeSpectralKey{sKey,data});
 }
+
 
 
 // ===================================================== SIGN =====================================================
@@ -467,6 +482,17 @@ void Presenter::on_signMelodicProfileVariationChanged(const Sign& sign, Variatio
   {
     auto data = sign.signData();
     data.melodicProfile.var = newVar;
+
+    m_disp.submit(new ChangeSign{sign, data});
+  }
+}
+
+void Presenter::on_signMelodicProfilePaceChanged(const Sign& sign, Pace pace){
+
+  if(sign.melodicProfile().pace != pace)
+  {
+    auto data = sign.signData();
+    data.melodicProfile.pace = pace;
 
     m_disp.submit(new ChangeSign{sign, data});
   }

@@ -22,11 +22,19 @@ enum Variation
     random_variation
 };
 
+enum Pace{
+    unknow =0,
+    lento,
+    moderato,
+    presto
+};
+
 struct MelodicProfile
 {
     Pitch pitch{mid};
     Pitch pitchEnd{mid};
     Variation var{none};
+    Pace pace{unknow};
 
     bool operator==(const MelodicProfile& other) const noexcept = default;
 };

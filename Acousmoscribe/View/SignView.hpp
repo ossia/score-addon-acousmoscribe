@@ -57,12 +57,13 @@ private:
 
   QRectF changeGrainRect() const noexcept;
   QRectF changeRhytmicProfileSpeedRect() const noexcept;
-  QRectF changeMelodicProfileVariationRect() const noexcept;
+//  QRectF changeMelodicProfileVariationRect() const noexcept; //UNUSED
   QRectF changeRythmicProfileAccelerationRect() const noexcept;
   QRectF changeMelodicProfilePitchRect() const noexcept;
   QRectF changeMelodicProfilePitchEndRect() const noexcept;
   QRectF changeMelodicProfileVolumeStartRect() const noexcept;
   QRectF changeMelodicProfileVolumeEndRect() const noexcept;
+  QRectF changeMelodicProfilePaceRect() const noexcept;
 
   QPolygonF polygon() const noexcept;
 
@@ -80,7 +81,8 @@ private:
     ChangeSignVolumeEnd,
     ChangeMelodicProfilePitch,
     ChangeMelodicProfilePitchEnd,
-    ChangeMelodicProfileVariation,
+//    ChangeMelodicProfileVariation, //UNUSED
+    ChangeMelodicProfilePace,
     ChangeRhythmicProfileSpeed,
     ChangeRhythmicProfileAcceleration,
     ChangeGrain,
