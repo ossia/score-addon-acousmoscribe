@@ -52,8 +52,8 @@ const RhythmicProfile& Sign::rhythmicProfile() const {
     return m_impl.rhythmicProfile;
 }
 
-GrainProfile Sign::grainProfile() const {
-    return m_impl.grainProfile();
+const GrainProfile& Sign::grainProfile() const {
+    return m_impl.grainProfile;
 }
 
 /*

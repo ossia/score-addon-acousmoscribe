@@ -29,6 +29,6 @@ template <>
 void JSONWriter::write(Acousmoscribe::GrainProfile& gp)
 {
   const auto& arr = base.GetArray();
-  gp.variation = static_cast<Acousmoscribe::Grain>(arr[0].GetInt());
+  gp.grain = static_cast<Acousmoscribe::Grain>(arr[0].GetInt());
   gp.variation = static_cast<Acousmoscribe::Variation>(arr[1].GetInt());
 }

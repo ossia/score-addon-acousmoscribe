@@ -19,7 +19,7 @@
 /* Model */
 #include <Acousmoscribe/Model/Process.hpp>
 #include <Acousmoscribe/Model/Sign.hpp>
-#include <Acousmoscribe/Model/Grain.hpp>
+#include <Acousmoscribe/Model/GrainProfile.hpp>
 #include <Acousmoscribe/Model/MelodicKey.hpp>
 #include <Acousmoscribe/Model/SpectralKey.hpp>
 #include <Acousmoscribe/Model/RhythmicProfile.hpp>
@@ -522,12 +522,12 @@ void Presenter::on_signRhythmicProfileAccelerationChanged(const Sign& sign, Acce
   }
 }
 
-void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, bool newIsRandom)
+void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, Variation newIsRandom)
 {
-  if(sign.rhythmicProfile().isRandom != newIsRandom)
+  if(sign.rhythmicProfile().variation != newIsRandom)
   {
     auto data = sign.signData();
-    data.rhythmicProfile.isRandom = newIsRandom;
+    data.rhythmicProfile.variation = newIsRandom;
 
     m_disp.submit(new ChangeSign{sign, data});
   }
@@ -537,10 +537,10 @@ void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, bool new
 
 void Presenter::on_signGrainChanged(const Sign& sign, Grain g)
 {
-  if(sign.grain() != g)
+  if(sign.grainProfile().grain != g)
   {
     auto data = sign.signData();
-    data.grain = g;
+    data.grainProfile.grain = g;
     m_disp.submit(new ChangeSign{sign, data});
   }
 }

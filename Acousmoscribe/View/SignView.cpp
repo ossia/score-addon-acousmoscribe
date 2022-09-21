@@ -302,12 +302,11 @@ QPainterPath  SignView::shape() const
 void SignView::drawVariation(QPainter*p,QPointF origin,bool down) const{
 
   int dir = (down ? 1 : -1);
-  QPoint mid = {origin.x()+2,origin.y()+(1*dir)};
-  QPoint end = {origin.x()+4,origin.y()};
-  QLine l1 = {origin,mid};
-  QLine l2 = {mid,end};
-  p->drawLine(l1);
-  p->drawLine(l2);
+  QPointF mid = {origin.x()+2,origin.y()+(1*dir)};
+  QPointF end = {origin.x()+4,origin.y()};
+
+  p->drawLine(origin,mid);
+  p->drawLine(mid,end);
 
 
 }
@@ -620,7 +619,7 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
       }
       case ChangeGrain:
       {
-        Grain g = (Grain)(((int)sign.grain() + 1) % 4);
+        Grain g = (Grain)(((int)sign.grainProfile().grain + 1) % 4);
         m_presenter.on_signGrainChanged(sign, g);
         break;
       }

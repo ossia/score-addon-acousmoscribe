@@ -26,7 +26,7 @@ struct SignData
     double start{};
     double duration{};
 
-    GrainProfile grainProfile();
+    GrainProfile grainProfile{};
     DynamicProfile dynamicProfile{};
     MelodicProfile melodicProfile{};
     RhythmicProfile rhythmicProfile{};
@@ -57,7 +57,7 @@ public:
     const DynamicProfile& dynamicProfile() const;
     const MelodicProfile& melodicProfile() const;
     const RhythmicProfile& rhythmicProfile() const;
-    Grain grain() const;
+    const GrainProfile& grainProfile() const;
 
     void scale(double s) noexcept;
     void setStart(double s) noexcept;
@@ -65,7 +65,7 @@ public:
     void setDynamicProfile(DynamicProfile d);
     void setMelodicProfile(MelodicProfile d);
     void setRhythmicProfile(RhythmicProfile d);
-    void setGrain(Grain g);
+    void setGrainProfile(GrainProfile g);
 
     void setData(SignData d);
     SignData signData() const;

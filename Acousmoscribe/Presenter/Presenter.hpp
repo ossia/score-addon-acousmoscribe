@@ -113,7 +113,7 @@ public:
   //void on_signRhythmicProfileChanged(Sign& v, RhythmicProfile rp);
   void on_signRhythmicProfileSpeedChanged(const Sign&, Speed newSpeed);
   void on_signRhythmicProfileAccelerationChanged(const Sign&, Acceleration newAcc);
-  void on_signRhythmicProfileIsRandomChanged(const Sign&, bool newIsRandom);
+  void on_signRhythmicProfileIsRandomChanged(const Sign&, Variation newIsRandom);
   void on_signGrainChanged(const Sign&, Grain g);
 
   void on_selectionChanged(SignView*, bool ok);

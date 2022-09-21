@@ -16,7 +16,7 @@ RemoveSigns::RemoveSigns(const Model& model, const std::vector<Id<Sign>>& signs)
   {
     auto& sign = model.signs.at(id);
     m_signs.push_back(
-        std::make_pair(id, SignData{sign.start(), sign.duration(), sign.grain(), sign.dynamicProfile(), sign.melodicProfile(), sign.rhythmicProfile()}));
+        std::make_pair(id, SignData{sign.start(), sign.duration(), sign.grainProfile(), sign.dynamicProfile(), sign.melodicProfile(), sign.rhythmicProfile()}));
   }
 }
 
