@@ -54,6 +54,7 @@ private:
 
   bool contains(const QPointF& point) const override;
   QPainterPath shape() const override;
+  void drawVariation(QPainter* painter,QPointF origin, bool down = true) const;
 
   QRectF changeGrainRect() const noexcept;
   QRectF changeRhytmicProfileSpeedRect() const noexcept;

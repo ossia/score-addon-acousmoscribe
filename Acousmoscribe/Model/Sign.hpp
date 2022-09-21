@@ -5,7 +5,7 @@
 #include <verdigris>
 #include <iostream>
 
-#include "Grain.hpp"
+#include "GrainProfile.hpp"
 //#include "DynamicProfile.hpp"
 #include "MelodicProfile.hpp"
 #include "RhythmicProfile.hpp"
@@ -26,7 +26,7 @@ struct SignData
     double start{};
     double duration{};
 
-    Grain grain{smooth};
+    GrainProfile grainProfile();
     DynamicProfile dynamicProfile{};
     MelodicProfile melodicProfile{};
     RhythmicProfile rhythmicProfile{};

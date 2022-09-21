@@ -15,14 +15,14 @@
 template <>
 void DataStreamReader::read(const Acousmoscribe::RhythmicProfile& rp)
 {
-  m_stream << rp.speed << rp.acceleration << rp.isRandom;
+  m_stream << rp.speed << rp.acceleration << rp.variation;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::RhythmicProfile& rp)
 {
-  m_stream >> rp.speed >> rp.acceleration >> rp.isRandom;
+  m_stream >> rp.speed >> rp.acceleration >> rp.variation;
   checkDelimiter();
 }
 
@@ -32,7 +32,7 @@ void JSONReader::read(const Acousmoscribe::RhythmicProfile& rp)
   stream.StartArray();
   stream.Int(rp.speed);
   stream.Int(rp.acceleration);
-  stream.Bool(rp.isRandom);
+  stream.Int(rp.variation);
   stream.EndArray();
 }
 
@@ -42,5 +42,5 @@ void JSONWriter::write(Acousmoscribe::RhythmicProfile& rp)
   const auto& arr = base.GetArray();
   rp.speed = static_cast<Acousmoscribe::Speed>(arr[0].GetInt());
   rp.acceleration = static_cast<Acousmoscribe::Acceleration>(arr[1].GetInt());
-  rp.isRandom = arr[2].GetBool();
+  rp.variation = static_cast<Acousmoscribe::Variation>(arr[2].GetInt());
 }

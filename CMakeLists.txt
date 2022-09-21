@@ -30,13 +30,13 @@ set(HDRS
 
     #Model
     Acousmoscribe/Model/Process.hpp
-    Acousmoscribe/Model/Grain.hpp
+    Acousmoscribe/Model/GrainProfile.hpp
     Acousmoscribe/Model/MelodicProfile.hpp
     Acousmoscribe/Model/MelodicKey.hpp
     Acousmoscribe/Model/RhythmicProfile.hpp
     Acousmoscribe/Model/SpectralKey.hpp
     Acousmoscribe/Model/Sign.hpp
-
+    Acousmoscribe/Model/Variation.hpp
     score_addon_acousmoscribe.hpp
 )
 set(SRCS
@@ -70,6 +70,7 @@ set(SRCS
     Acousmoscribe/Commands/ScaleSigns.cpp
 
     #Model
+    Acousmoscribe/Model/GrainProfile.cpp
     Acousmoscribe/Model/Process.cpp
     Acousmoscribe/Model/MelodicProfile.cpp
     Acousmoscribe/Model/MelodicKey.cpp

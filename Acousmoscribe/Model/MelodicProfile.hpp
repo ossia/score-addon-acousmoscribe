@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-
+#include "Variation.hpp"
 //#include <verdigris>
 
 namespace Acousmoscribe{
@@ -14,12 +14,6 @@ enum Pitch
     mid_low,
     low,
     very_low
-};
-
-enum Variation
-{
-    none = 0,
-    random_variation
 };
 
 enum Pace{

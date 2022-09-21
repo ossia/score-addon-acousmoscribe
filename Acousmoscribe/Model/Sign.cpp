@@ -52,8 +52,8 @@ const RhythmicProfile& Sign::rhythmicProfile() const {
     return m_impl.rhythmicProfile;
 }
 
-Grain Sign::grain() const {
-    return m_impl.grain;
+GrainProfile Sign::grainProfile() const {
+    return m_impl.grainProfile();
 }
 
 /*
@@ -110,8 +110,8 @@ void Sign::setRhythmicProfile(RhythmicProfile d) {
     signChanged();
 }
 
-void Sign::setGrain(Grain g)  {
-    m_impl.grain = g;
+void Sign::setGrainProfile(GrainProfile g)  {
+    m_impl.grainProfile = g;
     signChanged();
 }
 
@@ -159,14 +159,14 @@ void JSONWriter::write(Acousmoscribe::DynamicProfile& dp)
 template <>
 void DataStreamReader::read(const Acousmoscribe::SignData& sd)
 {
-  m_stream << sd.start << sd.duration << sd.grain << sd.dynamicProfile << sd.melodicProfile << sd.rhythmicProfile;
+  m_stream << sd.start << sd.duration << sd.grainProfile << sd.dynamicProfile << sd.melodicProfile << sd.rhythmicProfile;
   insertDelimiter();
 }
 
 template <>
 void DataStreamWriter::write(Acousmoscribe::SignData& sd)
 {
-  m_stream >> sd.start >> sd.duration >> sd.grain >> sd.dynamicProfile >> sd.melodicProfile >> sd.rhythmicProfile;
+  m_stream >> sd.start >> sd.duration >> sd.grainProfile >> sd.dynamicProfile >> sd.melodicProfile >> sd.rhythmicProfile;
   checkDelimiter();
 }
 
@@ -176,7 +176,7 @@ void JSONReader::read(const Acousmoscribe::SignData& sd)
   stream.StartArray();
   stream.Double(sd.start);
   stream.Double(sd.duration);
-  stream.Int(sd.grain);
+  JSONReader::read(sd.grainProfile);
   JSONReader::read(sd.dynamicProfile);
   JSONReader::read(sd.melodicProfile);
   JSONReader::read(sd.rhythmicProfile);
@@ -189,7 +189,7 @@ void JSONWriter::write(Acousmoscribe::SignData& sd)
   const auto& arr = base.GetArray();
   sd.start = arr[0].GetDouble();
   sd.duration = arr[1].GetDouble();
-  sd.grain = (Acousmoscribe::Grain) arr[2].GetInt();
+  JSONWriter::write(sd.grainProfile);
   JSONWriter::write(sd.dynamicProfile);
   JSONWriter::write(sd.melodicProfile);
   JSONWriter::write(sd.rhythmicProfile);
@@ -218,7 +218,7 @@ void JSONReader::read(const Acousmoscribe::Sign& s)
   stream.StartArray();
   stream.Double(s.m_impl.start);
   stream.Double(s.m_impl.duration);
-  stream.Int(s.m_impl.grain);
+  JSONReader::read(s.m_impl.grainProfile);
   JSONReader::read(s.m_impl.dynamicProfile);
   JSONReader::read(s.m_impl.melodicProfile);
   JSONReader::read(s.m_impl.rhythmicProfile);
@@ -231,7 +231,7 @@ void JSONWriter::write(Acousmoscribe::Sign& s)
   const auto& arr = obj["Sign"].toArray();
   s.m_impl.start = arr[0].GetDouble();
   s.m_impl.duration = arr[1].GetDouble();
-  s.m_impl.grain = (Acousmoscribe::Grain) arr[2].GetInt();
+  JSONWriter{JsonValue{arr[2]}}.write(s.m_impl.grainProfile);
   JSONWriter{JsonValue{arr[3]}}.write(s.m_impl.dynamicProfile);
   JSONWriter{JsonValue{arr[4]}}.write(s.m_impl.melodicProfile);
   JSONWriter{JsonValue{arr[5]}}.write(s.m_impl.rhythmicProfile);

@@ -52,7 +52,7 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   //float x_left = x0;
   float x_right = x0 + w;
 
-  Grain grain = sign.grain();
+  Grain grain = sign.grainProfile().grain;
   Speed speed = sign.rhythmicProfile().speed;
   Acceleration acc = sign.rhythmicProfile().acceleration;
   Pace pace = sign.melodicProfile().pace;
@@ -299,7 +299,18 @@ QPainterPath  SignView::shape() const
   return p;
 
 }
+void SignView::drawVariation(QPainter*p,QPointF origin,bool down) const{
 
+  int dir = (down ? 1 : -1);
+  QPoint mid = {origin.x()+2,origin.y()+(1*dir)};
+  QPoint end = {origin.x()+4,origin.y()};
+  QLine l1 = {origin,mid};
+  QLine l2 = {mid,end};
+  p->drawLine(l1);
+  p->drawLine(l2);
+
+
+}
 QRectF SignView::computeRect() const noexcept
 {
   auto& view = *(View*)parentItem();

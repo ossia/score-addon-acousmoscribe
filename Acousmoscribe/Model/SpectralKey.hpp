@@ -31,8 +31,8 @@ enum Coloration
 {
     Nature nature{};
     Nature hybrid_nature{};
-    Nature hybrid_nature2{};
     Nature nature2{};
+    Nature hybrid_nature2{};
     Coloration coloration{};
     Coloration coloration2{};
     bool isHybrid{false};

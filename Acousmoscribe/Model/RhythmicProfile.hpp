@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <verdigris>
-
+#include "Variation.hpp"
 namespace Acousmoscribe{
 enum Speed
 {
@@ -25,7 +25,8 @@ struct RhythmicProfile
 {
     Speed speed{continuous};
     Acceleration acceleration{constant};
-    bool isRandom{false};
+    Variation variation{none};
+
     bool operator==(const RhythmicProfile&) const noexcept = default;
 };
 
