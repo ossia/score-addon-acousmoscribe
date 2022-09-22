@@ -27,7 +27,7 @@ struct MelodicProfile
 {
     Pitch pitch{mid};
     Pitch pitchEnd{mid};
-    Variation var{none};
+    Variation variation{none};
     Pace pace{unknow};
 
     bool operator==(const MelodicProfile& other) const noexcept = default;

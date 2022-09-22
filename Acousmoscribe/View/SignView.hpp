@@ -54,17 +54,20 @@ private:
 
   bool contains(const QPointF& point) const override;
   QPainterPath shape() const override;
-  void drawVariation(QPainter* painter,QPointF origin, bool down = true) const;
+  void drawVariationLine(QPainter* painter,QLineF line, bool down = true) const;
 
-  QRectF changeGrainRect() const noexcept;
-  QRectF changeRhytmicProfileSpeedRect() const noexcept;
-//  QRectF changeMelodicProfileVariationRect() const noexcept; //UNUSED
-  QRectF changeRythmicProfileAccelerationRect() const noexcept;
+  QRectF changeGrainProfileGrainRect() const noexcept;
+  QRectF changeGrainProfileVariationRect() const noexcept;
+  QRectF changeRhythmicProfileSpeedRect() const noexcept;
+  QRectF changeRhythmicProfileAccelerationRect() const noexcept;
+  QRectF changeRhythmicProfileVariationRect() const noexcept;
   QRectF changeMelodicProfilePitchRect() const noexcept;
   QRectF changeMelodicProfilePitchEndRect() const noexcept;
   QRectF changeMelodicProfileVolumeStartRect() const noexcept;
   QRectF changeMelodicProfileVolumeEndRect() const noexcept;
   QRectF changeMelodicProfilePaceRect() const noexcept;
+  QRectF changeMelodicProfileVariationRect() const noexcept;
+
 
   QPolygonF polygon() const noexcept;
 
@@ -82,11 +85,13 @@ private:
     ChangeSignVolumeEnd,
     ChangeMelodicProfilePitch,
     ChangeMelodicProfilePitchEnd,
-//    ChangeMelodicProfileVariation, //UNUSED
+    ChangeMelodicProfileVariation,
     ChangeMelodicProfilePace,
     ChangeRhythmicProfileSpeed,
     ChangeRhythmicProfileAcceleration,
-    ChangeGrain,
+    ChangeRhythmicProfileVariation,
+    ChangeGrainProfileGrain,
+    ChangeGrainProfileVar,
     ChangeSpeed,
     Duplicate
   } m_action{};

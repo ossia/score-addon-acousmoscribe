@@ -56,6 +56,9 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   Speed speed = sign.rhythmicProfile().speed;
   Acceleration acc = sign.rhythmicProfile().acceleration;
   Pace pace = sign.melodicProfile().pace;
+  Variation rhythmVar = sign.rhythmicProfile().variation;
+  Variation grainVar = sign.grainProfile().variation;
+  Variation melodicVar = sign.melodicProfile().variation;
 
   //double duration = sign.duration();
   float volumeStart = sign.dynamicProfile().volumeStart;
@@ -116,7 +119,13 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   }
 
   painter->setPen(p);
-  painter->drawLine(b, c);
+  if(grainVar==random_var){
+      drawVariationLine(painter,{b,c});
+
+  }
+  else{
+      painter->drawLine(b, c);
+  }
 
   /* RHYTHMIC */
   switch (speed)
@@ -136,7 +145,13 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   }
 
   painter->setPen(p);
-  painter->drawLine(d, a);
+  if(rhythmVar==random_var){
+      drawVariationLine(painter,{a,d},false);
+
+  }
+  else{
+      painter->drawLine(a, d);
+  }
 
   p.setStyle(Qt::SolidLine);
   painter->setPen(p);
@@ -222,12 +237,20 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
       break;
     }
     }
-
-  }else{
-     painter->drawLine(firstP, secondP);
   }
+    else{
+        painter->drawLine(firstP, secondP);
 
+    }
+
+
+  if(melodicVar==random_var)
+  {
+      int span = 8;
+      painter->drawLine(secondP,QPoint{secondP.x()+8,secondP.y()+8});
+      painter->drawLine(QPoint{secondP.x()+8,secondP.y()+8},QPoint{secondP.x()+16,secondP.y()});
   }
+}
 
   // Draw control buttons
   if(m_mousePos && w > 30)
@@ -238,14 +261,17 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 
     const auto& textOpts = buttonTextOptions();
     for(auto [r1, text] : {
-        std::make_pair(changeGrainRect(), "GRN"),
-        std::make_pair(changeRhytmicProfileSpeedRect(), "SPD"),
+        std::make_pair(changeGrainProfileGrainRect(), "GRN"),
+        std::make_pair(changeRhythmicProfileSpeedRect(), "SPD"),
         std::make_pair(changeMelodicProfilePaceRect(), "PCE"),
-        std::make_pair(changeRythmicProfileAccelerationRect(), "ACC"),
+        std::make_pair(changeRhythmicProfileAccelerationRect(), "ACC"),
         std::make_pair(changeMelodicProfilePitchRect(), "| P"),
         std::make_pair(changeMelodicProfilePitchEndRect(), "P |"),
         std::make_pair(changeMelodicProfileVolumeStartRect(), "| V"),
         std::make_pair(changeMelodicProfileVolumeEndRect(), "V |"),
+        std::make_pair(changeGrainProfileVariationRect(), "GR V"),
+        std::make_pair(changeRhythmicProfileVariationRect(), "Sp V"),
+        std::make_pair(changeMelodicProfileVariationRect(), "P V")
       })
     {
       if(r1.contains(*m_mousePos))
@@ -299,14 +325,22 @@ QPainterPath  SignView::shape() const
   return p;
 
 }
-void SignView::drawVariation(QPainter*p,QPointF origin,bool down) const{
+void SignView::drawVariationLine(QPainter*p,QLineF line,bool down) const{
 
   int dir = (down ? 1 : -1);
-  QPointF mid = {origin.x()+2,origin.y()+(1*dir)};
-  QPointF end = {origin.x()+4,origin.y()};
+  int span = 8;
+  QPointF midL = (line.p2() + line.p1())/2;
+  midL.rx()-=span;
+  QPointF midR = (line.p2() + line.p1())/2;
+  midR.rx()+=span;
+  QPointF mid = (line.p2() + line.p1())/2;
+  mid.ry()+=(span*dir);
 
-  p->drawLine(origin,mid);
-  p->drawLine(mid,end);
+  p->drawLine(line.p1(),midL);
+  p->drawLine(midL,mid);
+  p->drawLine(mid,midR);
+  p->drawLine(midR,line.p2());
+
 
 
 }
@@ -426,15 +460,19 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
       m_action = Scale;
     }
-    else if (changeGrainRect().contains(pos))
+    else if (changeGrainProfileGrainRect().contains(pos))
     {
-      m_action = ChangeGrain;
+      m_action = ChangeGrainProfileGrain;
     }
-    else if (changeRhytmicProfileSpeedRect().contains(pos))
+    else if (changeGrainProfileVariationRect().contains(pos))
+    {
+      m_action = ChangeGrainProfileVar;
+    }
+    else if (changeRhythmicProfileSpeedRect().contains(pos))
     {
       m_action = ChangeRhythmicProfileSpeed;
     }
-    else if (changeRythmicProfileAccelerationRect().contains(pos))
+    else if (changeRhythmicProfileAccelerationRect().contains(pos))
     {
       m_action = ChangeRhythmicProfileAcceleration;
     }
@@ -458,6 +496,14 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
       m_action = ChangeSignVolumeEnd;
     }
+    else if (changeMelodicProfileVariationRect().contains(pos))
+    {
+      m_action = ChangeMelodicProfileVariation;
+    }
+    else if (changeRhythmicProfileVariationRect().contains(pos))
+    {
+      m_action = ChangeRhythmicProfileVariation;
+    }
     else
     {
       m_action = Move;
@@ -467,59 +513,71 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
   event->accept();
 }
 
-QRectF SignView::changeGrainRect() const noexcept
+QRectF SignView::changeGrainProfileGrainRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 1 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 1 * w / 4, y0, w / 4, 0.5 *h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeGrainProfileVariationRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0, y0+h, w / 4, 0.5 *h}.adjusted(border, border, -border, -border);
 }
 
-QRectF SignView::changeRhytmicProfileSpeedRect() const noexcept
+QRectF SignView::changeRhythmicProfileSpeedRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 1 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 1 * w / 4, y0 + 0.5 *h, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
-/*QRectF SignView::changeMelodicProfileVariationRect() const noexcept
+QRectF SignView::changeMelodicProfileVariationRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 2 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
-}*/
-QRectF SignView::changeRythmicProfileAccelerationRect() const noexcept
+  return QRectF{x0 + 1 * w / 4, y0+h, w / 4, 0.5 *h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeRhythmicProfileVariationRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 2 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 2 * w / 4, y0+h, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
+}
+QRectF SignView::changeRhythmicProfileAccelerationRect() const noexcept
+{
+  const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
+  const int border = 3;
+  return QRectF{x0 + 2 * w / 4, y0 + 0.5 *h, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 QRectF SignView::changeMelodicProfilePitchRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 0, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 0, y0, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 QRectF SignView::changeMelodicProfilePitchEndRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 3 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 3 * w / 4, y0, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 QRectF SignView::changeMelodicProfileVolumeStartRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 0, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 0, y0 + 0.5 *h, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 QRectF SignView::changeMelodicProfileVolumeEndRect() const noexcept
 {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 3 * w / 4, y0 + 0.5 * h, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 3 * w / 4, y0 +0.5 *h, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 QRectF SignView::changeMelodicProfilePaceRect() const noexcept {
   const auto [x0, y0, w, h] { buttonItemRect(m_width, m_height) };
   const int border = 3;
-  return QRectF{x0 + 2 * w / 4, y0, w / 4, 0.5 * h}.adjusted(border, border, -border, -border);
+  return QRectF{x0 + 2 * w / 4, y0, w / 4,0.5 *h}.adjusted(border, border, -border, -border);
 }
 
 void SignView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -599,12 +657,12 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         m_presenter.on_signMelodicProfilePitchEndChanged(sign, pe);
         break;
       }
-//      case ChangeMelodicProfileVariation:
-//      {
-//        Variation v = (Variation)(((int)sign.melodicProfile().var + 1) % 2);
-//        m_presenter.on_signMelodicProfileVariationChanged(sign, v);
-//        break;
-//      }
+      case ChangeMelodicProfileVariation:
+      {
+        Variation v = (Variation)(((int)sign.melodicProfile().variation + 1) % 2);
+        m_presenter.on_signMelodicProfileVariationChanged(sign, v);
+        break;
+      }
       case ChangeMelodicProfilePace:
       {
        Pace p = (Pace)(((int)sign.melodicProfile().pace + 1) % 4);
@@ -617,12 +675,24 @@ void SignView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         m_presenter.on_signRhythmicProfileSpeedChanged(sign, s);
         break;
       }
-      case ChangeGrain:
+        case ChangeRhythmicProfileVariation:
+        {
+            Variation v = (Variation)(((int)sign.rhythmicProfile().variation + 1) % 2);
+            m_presenter.on_signRhythmicProfileVariationChanged(sign, v);
+            break;
+        }
+      case ChangeGrainProfileGrain:
       {
         Grain g = (Grain)(((int)sign.grainProfile().grain + 1) % 4);
-        m_presenter.on_signGrainChanged(sign, g);
+        m_presenter.on_signGrainProfileGrainChanged(sign, g);
         break;
       }
+        case ChangeGrainProfileVar:
+        {
+        Variation v = (Variation)(((int)sign.grainProfile().variation + 1) % 2);
+        m_presenter.on_signGrainProfileVariationChanged(sign, v);
+        break;
+        }
       case ChangeSpeed:
       {
         qDebug("TODO");

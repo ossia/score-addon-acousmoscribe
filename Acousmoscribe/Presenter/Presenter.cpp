@@ -478,10 +478,10 @@ void Presenter::on_signMelodicProfilePitchEndChanged(const Sign& sign, Pitch new
 }
 
 void Presenter::on_signMelodicProfileVariationChanged(const Sign& sign, Variation newVar){
-  if(sign.melodicProfile().var != newVar)
+  if(sign.melodicProfile().variation != newVar)
   {
     auto data = sign.signData();
-    data.melodicProfile.var = newVar;
+    data.melodicProfile.variation = newVar;
 
     m_disp.submit(new ChangeSign{sign, data});
   }
@@ -522,7 +522,7 @@ void Presenter::on_signRhythmicProfileAccelerationChanged(const Sign& sign, Acce
   }
 }
 
-void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, Variation newIsRandom)
+void Presenter::on_signRhythmicProfileVariationChanged(const Sign& sign, Variation newIsRandom)
 {
   if(sign.rhythmicProfile().variation != newIsRandom)
   {
@@ -535,12 +535,21 @@ void Presenter::on_signRhythmicProfileIsRandomChanged(const Sign& sign, Variatio
 
 // -------------------------------------------------- Sign/Grain  --------------------------------------------------
 
-void Presenter::on_signGrainChanged(const Sign& sign, Grain g)
+void Presenter::on_signGrainProfileGrainChanged(const Sign& sign, Grain g)
 {
   if(sign.grainProfile().grain != g)
   {
     auto data = sign.signData();
     data.grainProfile.grain = g;
+    m_disp.submit(new ChangeSign{sign, data});
+  }
+}
+void Presenter::on_signGrainProfileVariationChanged(const Sign& sign, Variation v)
+{
+  if(sign.grainProfile().variation != v)
+  {
+    auto data = sign.signData();
+    data.grainProfile.variation = v;
     m_disp.submit(new ChangeSign{sign, data});
   }
 }

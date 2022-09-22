@@ -56,7 +56,7 @@ std::array<float, 4> buttonItemRect(double width, double height) noexcept
   float x0 = 0.f;
   float y0 = 7.0f + height * (1. - h_margin);
   float w = width;
-  float h = h_margin * height - 10.;
+  float h = h_margin * height - 20.;
   return std::array<float, 4>{x0, y0, w, h};
 }
 }
