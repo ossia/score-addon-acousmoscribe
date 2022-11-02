@@ -155,6 +155,9 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 
   p.setStyle(Qt::SolidLine);
   painter->setPen(p);
+
+  //Drawing side lines
+
   painter->drawLine(a, b);
   painter->drawLine(c, d);
 
@@ -191,13 +194,21 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
       {
         p.setWidth(5); // the 4th point is bigger
         painter->setPen(p);
-        painter->drawPoint(QPoint(x_pitch, y_pitch));
+        if(c.y() < b.y()){
+            painter->drawPoint(QPoint(x_pitch+w, y_pitch));
+        } else {
+            painter->drawPoint(QPoint(x_pitch, y_pitch));
+        }
         p.setWidth(2);
         painter->setPen(p);
       }
       else
       {
-        painter->drawPoint(QPoint(x_pitch, y_pitch));
+         if(c.y()<b.y()){
+             painter->drawPoint(QPoint(x_pitch+w, y_pitch));
+         } else {
+             painter->drawPoint(QPoint(x_pitch, y_pitch));
+         }
       }
     }
   }
@@ -206,9 +217,17 @@ void SignView::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
   {
   p.setWidth(2);
   painter->setPen(p);
+  auto firstP = QPoint{};
+  auto secondP = QPoint{};
+  if(c.y() < b.y()){
+      firstP = QPoint(w+x_pitch + 0.015 * w, pitchY[pitch]);
+      secondP = QPoint(w+x_pitch + 0.3 * w, pitchY[pitchEnd]);
+  }
+  else {
+    firstP = QPoint(x_pitch + 0.015 * w, pitchY[pitch]);
+    secondP = QPoint(x_pitch + 0.3 * w, pitchY[pitchEnd]);
+  }
 
-  auto firstP = QPoint(x_pitch + 0.015 * w, pitchY[pitch]);
-  auto secondP = QPoint(x_pitch + 0.3 * w, pitchY[pitchEnd]);
   if(pace!=Pace::unknow && firstP.y() == secondP.y()){
     int half = (secondP.x() - firstP.x())/2.0;
     QPoint a{firstP.x(),firstP.y()-half};
