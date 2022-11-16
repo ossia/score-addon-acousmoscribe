@@ -1,16 +1,17 @@
 #pragma once
-#include <Acousmoscribe/View/View.hpp>
 #include "Acousmoscribe/Model/Sign.hpp"
-#include <Acousmoscribe/Presenter/Presenter.hpp>
+
 #include <QGraphicsItem>
+
+#include <Acousmoscribe/Presenter/Presenter.hpp>
+#include <Acousmoscribe/View/View.hpp>
 
 namespace Acousmoscribe
 {
 class View;
 class Presenter;
 class Sign;
-class SignView final
-    : public QGraphicsItem
+class SignView final : public QGraphicsItem
 {
   Q_INTERFACES(QGraphicsItem)
 
@@ -20,7 +21,7 @@ public:
 
   void setWidth(qreal w) noexcept
   {
-    if (m_width != w)
+    if(m_width != w)
     {
       prepareGeometryChange();
       m_width = w;
@@ -29,7 +30,7 @@ public:
 
   void setHeight(qreal h) noexcept
   {
-    if (m_height != h)
+    if(m_height != h)
     {
       prepareGeometryChange();
       m_height = h;
@@ -37,7 +38,8 @@ public:
   }
 
   QRectF boundingRect() const override { return {0, 0, m_width, m_height}; }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+      override;
 
   QRectF computeRect() const noexcept;
   QPointF closestPos(QPointF sign) const noexcept;
@@ -54,20 +56,20 @@ private:
 
   bool contains(const QPointF& point) const override;
   QPainterPath shape() const override;
-  void drawVariationLine(QPainter* painter,QLineF line, bool down = true) const;
+  void drawVariationLine(QPainter* painter, QLineF line, bool down = true) const;
 
-  QRectF changeGrainProfileGrainRect() const noexcept;
-  QRectF changeGrainProfileVariationRect() const noexcept;
-  QRectF changeRhythmicProfileSpeedRect() const noexcept;
-  QRectF changeRhythmicProfileAccelerationRect() const noexcept;
-  QRectF changeRhythmicProfileVariationRect() const noexcept;
-  QRectF changeMelodicProfilePitchRect() const noexcept;
-  QRectF changeMelodicProfilePitchEndRect() const noexcept;
-  QRectF changeMelodicProfileVolumeStartRect() const noexcept;
-  QRectF changeMelodicProfileVolumeEndRect() const noexcept;
-  QRectF changeMelodicProfilePaceRect() const noexcept;
-  QRectF changeMelodicProfileVariationRect() const noexcept;
-
+  QRectF button(int i, int j) const noexcept;
+  QRectF pitchStartButton{};
+  QRectF grainButton{};
+  QRectF accelerationButton{};
+  QRectF pitchEndButton{};
+  QRectF volumeStartButton{};
+  QRectF speedButton{};
+  QRectF paceButton{};
+  QRectF speedVarButton{};
+  QRectF grainVarButton{};
+  QRectF volumeEndButton{};
+  QRectF pitchVarButton{};
 
   QPolygonF polygon() const noexcept;
 
@@ -77,7 +79,8 @@ private:
   float m_height{};
   std::optional<QPointF> m_mousePos;
 
-  enum Action {
+  enum Action
+  {
     None,
     Move,
     Scale,
