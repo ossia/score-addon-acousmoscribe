@@ -50,46 +50,17 @@ void SignView::paint(
   painter->setRenderHint(QPainter::Antialiasing, true);
 
   QPen p;
-  p.setWidth(2);
+  p.setWidth(5);
   painter->setPen(p);
-
-  const auto [x0, y0, w, h]{baseItemRect(m_width, m_height)};
-  painter->drawRect(x0, y0, w, h);
-  //float x_left = x0;
-  float x_right = x0 + w;
-
-  Grain grain = sign.grainProfile().grain;
-  Speed speed = sign.rhythmicProfile().speed;
-  Acceleration acc = sign.rhythmicProfile().acceleration;
-  Pace pace = sign.melodicProfile().pace;
-  Variation rhythmVar = sign.rhythmicProfile().variation;
-  Variation grainVar = sign.grainProfile().variation;
-  Variation melodicVar = sign.melodicProfile().variation;
-
-  //double duration = sign.duration();
   float volumeStart = sign.dynamicProfile().volumeStart;
   float volumeEnd = sign.dynamicProfile().volumeEnd;
-  float volumeUsed;
+  const auto [x0, y0, w, h]{baseItemRect(m_width, m_height)};
 
-  Pitch pitch = sign.melodicProfile().pitch;
-  Pitch pitchEnd = sign.melodicProfile().pitchEnd;
-
-  QPointF a(x0, y0 + h);
-  QPointF b(x0, y0 + h * (1 - volumeStart));
-  QPointF c(x0 + w, y0 + h * (1 - volumeEnd));
-  QPointF d(x0 + w, y0 + h);
-
-  double x_pitch = x0;      //x coordinate of the melodic profile on the sign
-  volumeUsed = volumeStart; // std::max(volumeStart, volumeEnd);
-  if(volumeUsed == volumeStart)
-  {
-    x_pitch += x_right * 0.025;
-    ;
-  }
-  else
-  {
-    x_pitch += x_right * 0.95;
-  }
+  signBoundaries[0] = QPointF{x0, y0 + h};
+  signBoundaries[1] = QPointF{x0, y0 + h * (1 - volumeStart)};
+  signBoundaries[2] = QPointF{x0 + w, y0 + h * (1 - volumeEnd)};
+  signBoundaries[3] = QPointF{x0 + w, y0 + h};
+  const auto& [a, b, c, d]{signBoundaries};
 
   p.setStyle(Qt::DotLine);
   painter->setBrush(fillColor);
@@ -106,6 +77,31 @@ void SignView::paint(
   painter->setPen(p);
 
   /* GRAIN */
+  paintGrainProfile(painter, p, {b, c});
+  /* RHYTHMIC */
+  paintRhythmicProfile(painter, p, {a, d});
+
+  //Drawing side lines
+
+  /* MELODIC */
+  paintMelodicProfile(painter, p);
+
+  // Draw control buttons
+
+  if(m_mousePos && w > 30)
+  {
+    p.setStyle(Qt::SolidLine);
+
+    painter->setFont(buttonFont(w / 4., h / 10.));
+    paintButtonControls(painter, p);
+  }
+  painter->setRenderHint(QPainter::Antialiasing, false);
+}
+void SignView::paintGrainProfile(QPainter* painter, QPen& p, QLineF grainLine)
+{
+  Grain grain = sign.grainProfile().grain;
+  Variation grainVar = sign.grainProfile().variation;
+
   switch(grain)
   {
     case smooth:
@@ -125,14 +121,26 @@ void SignView::paint(
   painter->setPen(p);
   if(grainVar == random_var)
   {
-    drawVariationLine(painter, {b, c});
+    drawVariationLine(painter, grainLine);
   }
   else
   {
-    painter->drawLine(b, c);
+    painter->drawLine(grainLine);
   }
+}
+void SignView::paintRhythmicProfile(QPainter* painter, QPen& p, QLineF rhytmLine)
+{
 
-  /* RHYTHMIC */
+  Speed speed = sign.rhythmicProfile().speed;
+  Variation rhythmVar = sign.rhythmicProfile().variation;
+  Acceleration acc = sign.rhythmicProfile().acceleration;
+  float volumeStart = sign.dynamicProfile().volumeStart;
+  float volumeEnd = sign.dynamicProfile().volumeEnd;
+  const auto [x0, y0, w, h]{baseItemRect(m_width, m_height)};
+  const auto& [a, b, c, d]{signBoundaries};
+
+  //float x_left = x0;
+  float x_right = x0 + w;
   switch(speed)
   {
     case slow:
@@ -152,11 +160,11 @@ void SignView::paint(
   painter->setPen(p);
   if(rhythmVar == random_var)
   {
-    drawVariationLine(painter, {a, d}, false);
+    drawVariationLine(painter, rhytmLine, false);
   }
   else
   {
-    painter->drawLine(a, d);
+    painter->drawLine(rhytmLine);
   }
 
   p.setStyle(Qt::SolidLine);
@@ -185,9 +193,36 @@ void SignView::paint(
     default:
       break;
   }
+}
 
-  /* MELODIC */
+void SignView::paintMelodicProfile(QPainter* painter, QPen& p)
+{
+  const auto [x0, y0, w, h]{baseItemRect(m_width, m_height)};
+  const auto& [a, b, c, d]{signBoundaries};
 
+  //float x_left = x0;
+  float x_right = x0 + w;
+
+  //double duration = sign.duration();
+  float volumeStart = sign.dynamicProfile().volumeStart;
+  float volumeUsed;
+
+  Variation melodicVar = sign.melodicProfile().variation;
+  Pace pace = sign.melodicProfile().pace;
+  Pitch pitch = sign.melodicProfile().pitch;
+  Pitch pitchEnd = sign.melodicProfile().pitchEnd;
+
+  double x_pitch = x0;      //x coordinate of the melodic profile on the sign
+  volumeUsed = volumeStart; // std::max(volumeStart, volumeEnd);
+  if(volumeUsed == volumeStart)
+  {
+    x_pitch += x_right * 0.025;
+    ;
+  }
+  else
+  {
+    x_pitch += x_right * 0.95;
+  }
   const float h_pitch = volumeUsed * 0.65;
 
   float pitchY[7];
@@ -235,17 +270,18 @@ void SignView::paint(
     painter->setPen(p);
     auto firstP = QPoint{};
     auto secondP = QPoint{};
+    float pitchW = (w > 4) ? w : 90;
     if(b.y() > (y0 + (h * 0.5)))
     {
-      firstP = QPoint(w + x_pitch - 0.015 * w, pitchY[pitch]);
-      secondP = QPoint(w + x_pitch - 0.3 * w, pitchY[pitchEnd]);
+      firstP = QPoint(w + x_pitch - 0.015 * pitchW, pitchY[pitch]);
+      secondP = QPoint(w + x_pitch - 0.3 * pitchW, pitchY[pitchEnd]);
     }
     else
     {
-      firstP = QPoint(x_pitch + 0.015 * w, pitchY[pitch]);
-      secondP = QPoint(x_pitch + 0.3 * w, pitchY[pitchEnd]);
+      firstP = QPoint(x_pitch + 0.015 * pitchW, pitchY[pitch]);
+      secondP = QPoint(x_pitch + 0.3 * pitchW, pitchY[pitchEnd]);
     }
-
+    /*Draw Pace*/
     if(pace != Pace::unknow && firstP.y() == secondP.y())
     {
       int half = (secondP.x() - firstP.x()) / 2.0;
@@ -295,53 +331,46 @@ void SignView::paint(
     if(melodicVar == random_var)
     {
       int span = 8;
-      painter->drawLine(secondP, QPoint{secondP.x() + 8, secondP.y() + 8});
+      painter->drawLine(secondP, QPoint{secondP.x() + span, secondP.y() + span});
       painter->drawLine(
-          QPoint{secondP.x() + 8, secondP.y() + 8},
-          QPoint{secondP.x() + 16, secondP.y()});
+          QPoint{secondP.x() + span, secondP.y() + span},
+          QPoint{secondP.x() + span * 2, secondP.y()});
     }
   }
-
-  // Draw control buttons
-
-  if(m_mousePos && w > 30)
-  {
-    p.setStyle(Qt::SolidLine);
-
-    painter->setFont(buttonFont(w / 4., h / 10.));
-    pitchStartButton = button(0, 0);
-    grainButton = button(1, 0);
-    paceButton = button(2, 0);
-    pitchEndButton = button(3, 0);
-    volumeStartButton = button(0, 1);
-    speedButton = button(1, 1);
-    accelerationButton = button(2, 1);
-    volumeEndButton = button(3, 1);
-    grainVarButton = button(0, 2);
-    speedVarButton = button(1, 2);
-    pitchVarButton = button(2, 2);
-    const auto& textOpts = buttonTextOptions();
-    for(auto [r1, text] :
-        {std::make_pair(pitchStartButton, "| P"), std::make_pair(grainButton, "GRN"),
-         std::make_pair(paceButton, "PCE"), std::make_pair(pitchEndButton, "P |"),
-         std::make_pair(volumeStartButton, "| V"), std::make_pair(speedButton, "SPD"),
-         std::make_pair(accelerationButton, "ACC"),
-         std::make_pair(volumeEndButton, "V |"), std::make_pair(grainVarButton, "GR V"),
-         std::make_pair(speedVarButton, "Sp V"), std::make_pair(pitchVarButton, "P V")})
-    {
-      if(r1.contains(*m_mousePos))
-        p.setColor(focusColor);
-      else
-        p.setColor(drawColor);
-
-      painter->setPen(p);
-      painter->drawRect(r1);
-      painter->drawText(r1, text, textOpts);
-    }
-  }
-  painter->setRenderHint(QPainter::Antialiasing, false);
 }
 
+void SignView::paintButtonControls(QPainter* painter, QPen& p)
+{
+  pitchStartButton = button(0, 0);
+  grainButton = button(1, 0);
+  paceButton = button(2, 0);
+  pitchEndButton = button(3, 0);
+  volumeStartButton = button(0, 1);
+  speedButton = button(1, 1);
+  accelerationButton = button(2, 1);
+  volumeEndButton = button(3, 1);
+  grainVarButton = button(0, 2);
+  speedVarButton = button(1, 2);
+  pitchVarButton = button(2, 2);
+  const auto& textOpts = buttonTextOptions();
+  for(auto [r1, text] :
+      {std::make_pair(pitchStartButton, "| P"), std::make_pair(grainButton, "GRN"),
+       std::make_pair(paceButton, "PCE"), std::make_pair(pitchEndButton, "P |"),
+       std::make_pair(volumeStartButton, "| V"), std::make_pair(speedButton, "SPD"),
+       std::make_pair(accelerationButton, "ACC"), std::make_pair(volumeEndButton, "V |"),
+       std::make_pair(grainVarButton, "GR V"), std::make_pair(speedVarButton, "Sp V"),
+       std::make_pair(pitchVarButton, "P V")})
+  {
+    if(r1.contains(*m_mousePos))
+      p.setColor(focusColor);
+    else
+      p.setColor(drawColor);
+
+    painter->setPen(p);
+    painter->drawRect(r1);
+    painter->drawText(r1, text, textOpts);
+  }
+}
 QPointF SignView::closestPos(QPointF newPos) const noexcept
 {
   auto& view = *(View*)parentItem();
@@ -568,8 +597,10 @@ void SignView::mousePressEvent(QGraphicsSceneMouseEvent* event)
 QRectF SignView::button(int i, int j) const noexcept
 {
   const auto [x0, y0, w, h]{buttonItemRect(m_width, m_height)};
+  const int cols = 4;
+  const int rows = 3;
   const int border = 3;
-  return QRectF{x0 + i * (w / 4), y0 + j * (h / 3), w / 4, h / 3}.adjusted(
+  return QRectF{x0 + i * (w / cols), y0 + j * (h / rows), w / cols, h / rows}.adjusted(
       border, border, -border, -border);
 }
 

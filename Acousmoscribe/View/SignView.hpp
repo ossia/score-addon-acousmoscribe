@@ -37,7 +37,7 @@ public:
     }
   }
 
-  QRectF boundingRect() const override { return {0, 0, m_width, m_height}; }
+  QRectF boundingRect() const override { return QRectF{0, 0, m_width, m_height}; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
       override;
 
@@ -53,6 +53,11 @@ private:
   void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+  void paintGrainProfile(QPainter* painter, QPen& p, QLineF grainLine);
+  void paintRhythmicProfile(QPainter* painter, QPen& p, QLineF rhytmLine);
+  void paintMelodicProfile(QPainter* painter, QPen& p);
+  void paintButtonControls(QPainter* painter, QPen& p);
 
   bool contains(const QPointF& point) const override;
   QPainterPath shape() const override;
@@ -71,6 +76,7 @@ private:
   QRectF volumeEndButton{};
   QRectF pitchVarButton{};
 
+  QPointF signBoundaries[4]{};
   QPolygonF polygon() const noexcept;
 
   Presenter& m_presenter;
